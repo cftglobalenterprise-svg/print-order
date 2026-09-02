@@ -308,15 +308,23 @@
     return true;
   }
   function categorize(name) {
-    const ext = (name.split(".").pop() || "").toLowerCase();
+    const ext = (String(name || "").split(".").pop() || "").toLowerCase();
     if (ext === "pdf") return "PDF";
     if (["jpg","jpeg","png","gif","webp","heic"].includes(ext)) return "图片";
     if (["doc","docx"].includes(ext)) return "Word 文档";
     return "其他文件";
   }
+  function normalizeFileEntry(f) {
+    // 有些来源（比如手机捷径）可能把文件资料错误地传成JSON字符串，这里做个容错处理
+    if (typeof f === "string") {
+      try { f = JSON.parse(f); } catch (e) { f = { name: f, url: "", pages: "?" }; }
+    }
+    if (!f || typeof f !== "object") f = { name: "未知文件", url: "", pages: "?" };
+    return { name: f.name || "未知文件", url: f.url || "", pages: f.pages ?? "?" };
+  }
   function renderFiles(files) {
     const groups = {};
-    (files || []).forEach(f => {
+    (files || []).map(normalizeFileEntry).forEach(f => {
       const cat = categorize(f.name);
       (groups[cat] = groups[cat] || []).push(f);
     });
@@ -474,6 +482,7 @@
     }
 
     list.innerHTML = filtered.map(o => {
+      try {
       const t = new Date(o.created_at).toLocaleString("zh-CN", { dateStyle: "short", timeStyle: "short" });
       const shortId = o.id.slice(0,8).toUpperCase();
       return `
@@ -489,7 +498,7 @@
               </div>
               <div class="time">${t}</div>
             </div>
-            <div class="price">RM ${Number(o.price).toFixed(2)}</div>
+            <div class="price">RM ${Number(o.price || 0).toFixed(2)}</div>
           </div>
           <div class="spec">
             <b>${o.paper_size}</b> · ${o.color_mode === "bw" ? "黑白" : "彩色"} ·
@@ -515,6 +524,21 @@
           </div>
         </div>
       `;
+      } catch (err) {
+        console.error("订单渲染出错", o.id, err);
+        return `
+          <div class="card">
+            <div class="card-top">
+              <span class="oid">#${(o.id || "").slice(0,8).toUpperCase()}</span>
+              <div class="price">RM ${Number(o.price || 0).toFixed(2)}</div>
+            </div>
+            <div class="phone-none">⚠️ 这张订单资料格式有问题，无法正常显示详情，但仍可以删除</div>
+            <div class="card-actions">
+              <button type="button" class="delete-btn" data-id="${o.id}">🗑 删除订单</button>
+            </div>
+          </div>
+        `;
+      }
     }).join("");
   }
 
