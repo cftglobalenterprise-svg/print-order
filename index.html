@@ -253,6 +253,52 @@
     color:var(--ink);
   }
 
+  /* wizard */
+  .wiz-progress{ display:flex; gap:6px; margin-bottom:18px; }
+  .wiz-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); transition:width .15s; }
+  .wiz-dot.current{ background:var(--stamp); width:20px; border-radius:4px; }
+  .wiz-dot.done{ background:var(--ink); }
+
+  .wiz-step.hidden{ display:none; }
+  .wiz-q{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px; font-weight:600; margin:0 0 14px;
+  }
+
+  .size-cards{ display:flex; gap:10px; margin-bottom:6px; }
+  .size-card{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    gap:8px; padding:10px 6px 12px;
+    border:1.3px solid var(--ink); background:transparent; cursor:pointer;
+    height:120px;
+  }
+  .size-card.active{ background:var(--ink); }
+  .size-card.active .size-name, .size-card.active .size-mm{ color:var(--paper); }
+  .size-card.active .size-rect{ background:var(--stamp); border-color:var(--paper); }
+  .size-rect{ background:var(--paper); border:1.3px solid var(--ink); flex-shrink:0; }
+  .size-name{ font-family:'IBM Plex Mono', monospace; font-size:14px; font-weight:700; }
+  .size-mm{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-soft); }
+
+  .chips-big{ display:flex; gap:10px; margin-bottom:6px; }
+  .chip-big{
+    flex:1; font-family:'IBM Plex Mono', monospace; font-size:14px; font-weight:600;
+    padding:16px 10px; border:1.3px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer;
+  }
+  .chip-big.active{ background:var(--ink); color:var(--paper); }
+
+  .stepper.big button{ width:44px; height:44px; font-size:22px; }
+  .stepper.big input{ width:52px; height:44px; font-size:18px; }
+
+  .wiz-next{ margin-top:4px; }
+  .wiz-back{
+    display:block; margin:12px auto 0; background:none; border:none; color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace; font-size:12px; cursor:pointer; text-decoration:underline;
+  }
+  .wiz-skip{
+    display:block; width:100%; margin-top:8px; background:none; border:none; color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace; font-size:12px; cursor:pointer; text-decoration:underline;
+  }
+
   /* total */
   .total-block{
     padding:18px 22px;
@@ -416,64 +462,91 @@
     <div class="section">
       <h2><span class="no">02</span>打印规格 SPEC</h2>
 
-      <div class="opt-row">
-        <span class="opt-label">纸张 Size</span>
-        <div class="chips" data-group="size">
-          <button class="chip active" data-value="A4">A4</button>
-          <button class="chip" data-value="A3">A3</button>
+      <div class="wiz-progress" id="wizProgress"></div>
+
+      <div class="wiz-step" data-step="size">
+        <p class="wiz-q">选择纸张尺寸</p>
+        <div class="size-cards" data-group="size">
+          <button type="button" class="size-card" data-value="A5">
+            <span class="size-rect" style="width:25px;height:35px;"></span>
+            <span class="size-name">A5</span>
+            <span class="size-mm">148×210mm</span>
+          </button>
+          <button type="button" class="size-card active" data-value="A4">
+            <span class="size-rect" style="width:35px;height:50px;"></span>
+            <span class="size-name">A4</span>
+            <span class="size-mm">210×297mm</span>
+          </button>
+          <button type="button" class="size-card" data-value="A3">
+            <span class="size-rect" style="width:50px;height:70px;"></span>
+            <span class="size-name">A3</span>
+            <span class="size-mm">297×420mm</span>
+          </button>
         </div>
       </div>
 
-      <div class="opt-row">
-        <span class="opt-label">颜色 Color</span>
-        <div class="chips" data-group="color">
-          <button class="chip active" data-value="bw">黑白</button>
-          <button class="chip" data-value="color">彩色</button>
+      <div class="wiz-step hidden" data-step="color">
+        <p class="wiz-q">黑白还是彩色？</p>
+        <div class="chips-big" data-group="color">
+          <button type="button" class="chip-big active" data-value="bw">黑白</button>
+          <button type="button" class="chip-big" data-value="color">彩色</button>
         </div>
+        <button type="button" class="wiz-back" data-back>← 上一步</button>
       </div>
 
-      <div class="opt-row">
-        <span class="opt-label">份数 Copies</span>
-        <div class="stepper" data-group="copies">
-          <button type="button" data-dir="-1">−</button>
-          <input type="text" value="1" inputmode="numeric" readonly>
-          <button type="button" data-dir="1">+</button>
+      <div class="wiz-step hidden" data-step="copies">
+        <p class="wiz-q">要印几份？</p>
+        <div style="display:flex; justify-content:center; margin-bottom:14px;">
+          <div class="stepper big" data-group="copies">
+            <button type="button" data-dir="-1">−</button>
+            <input type="text" value="1" inputmode="numeric" readonly>
+            <button type="button" data-dir="1">+</button>
+          </div>
         </div>
+        <button type="button" class="btn stamp wiz-next" data-next>下一步 →</button>
+        <button type="button" class="wiz-back" data-back>← 上一步</button>
       </div>
 
-      <div class="opt-row">
-        <span class="opt-label">双面打印 Double-sided</span>
-        <div class="chips" data-group="double">
-          <button class="chip" data-value="no">否</button>
-          <button class="chip active" data-value="yes">是</button>
+      <div class="wiz-step hidden" data-step="double">
+        <p class="wiz-q">要双面打印吗？</p>
+        <div class="chips-big" data-group="double">
+          <button type="button" class="chip-big" data-value="no">单面</button>
+          <button type="button" class="chip-big active" data-value="yes">双面</button>
         </div>
+        <button type="button" class="wiz-back" data-back>← 上一步</button>
       </div>
 
-      <div class="opt-row">
-        <span class="opt-label">过胶 Laminate</span>
-        <div class="chips" data-group="cover">
-          <button class="chip active" data-value="no">否</button>
-          <button class="chip" data-value="yes">是</button>
+      <div class="wiz-step hidden" data-step="cover">
+        <p class="wiz-q">需要过胶吗？</p>
+        <div class="chips-big" data-group="cover">
+          <button type="button" class="chip-big active" data-value="no">不用</button>
+          <button type="button" class="chip-big" data-value="yes">要过胶</button>
         </div>
+        <button type="button" class="wiz-back" data-back>← 上一步</button>
       </div>
 
-      <div class="opt-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:6px;">
-        <span class="opt-label">联系电话 Phone（方便通知你取件）</span>
+      <div class="wiz-step hidden" data-step="phone">
+        <p class="wiz-q">联系电话（方便通知你取件）</p>
         <input type="tel" id="phoneInput" placeholder="012-3456789">
+        <button type="button" class="btn stamp wiz-next" data-next>完成 →</button>
+        <button type="button" class="wiz-skip" data-skip>跳过，不留电话</button>
+        <button type="button" class="wiz-back" data-back>← 上一步</button>
       </div>
     </div>
 
-    <div class="perf"></div>
+    <div id="specDone" class="hidden">
+      <div class="perf"></div>
 
-    <div class="total-block">
-      <div class="total-row"><span id="priceBreak1">A4 黑白 × 1页 × 1份</span><span id="priceBreak1v">RM 0.50</span></div>
-      <div class="total-row hidden" id="priceBreak2Row"><span>过胶</span><span id="priceBreak2v">RM 0.00</span></div>
-      <div class="total-row main"><span>总额 TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
-    </div>
+      <div class="total-block">
+        <div class="total-row"><span id="priceBreak1">A4 黑白 × 1页 × 1份</span><span id="priceBreak1v">RM 0.50</span></div>
+        <div class="total-row hidden" id="priceBreak2Row"><span>过胶</span><span id="priceBreak2v">RM 0.00</span></div>
+        <div class="total-row main"><span>总额 TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
+      </div>
 
-    <div class="actions">
-      <button class="btn stamp" id="toPaymentBtn">下一步：付款 →</button>
-      <p class="error-msg" id="formError"></p>
+      <div class="actions">
+        <button class="btn stamp" id="toPaymentBtn">下一步：付款 →</button>
+        <p class="error-msg" id="formError"></p>
+      </div>
     </div>
   </div>
 
@@ -523,10 +596,11 @@
 
   // 价格表 —— 之后要改价钱就改这里
   const RATES = {
+    A5: { bw: 0.30, color: 0.60 },
     A4: { bw: 0.50, color: 1.00 },
     A3: { bw: 1.00, color: 2.00 }
   };
-  const COVER_RATE = { A4: 3.00, A3: 5.00 };
+  const COVER_RATE = { A5: 2.00, A3: 5.00, A4: 3.00 };
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -539,18 +613,56 @@
   };
   let fileSeq = 0;
 
-  // ---- chip groups ----
-  document.querySelectorAll(".chips").forEach(group => {
+  // ---- wizard navigation ----
+  const wizSteps = ["size", "color", "copies", "double", "cover", "phone"];
+  let wizIndex = 0;
+
+  function renderWizProgress() {
+    document.getElementById("wizProgress").innerHTML = wizSteps.map((s, i) =>
+      `<span class="wiz-dot ${i === wizIndex ? "current" : ""} ${i < wizIndex ? "done" : ""}"></span>`
+    ).join("");
+  }
+  function showWizStep(idx) {
+    wizIndex = idx;
+    document.querySelectorAll(".wiz-step").forEach(el => el.classList.add("hidden"));
+    const el = document.querySelector(`.wiz-step[data-step="${wizSteps[idx]}"]`);
+    if (el) el.classList.remove("hidden");
+    renderWizProgress();
+  }
+  function nextWizStep() {
+    if (wizIndex < wizSteps.length - 1) {
+      showWizStep(wizIndex + 1);
+    } else {
+      document.querySelectorAll(".wiz-step").forEach(el => el.classList.add("hidden"));
+      document.getElementById("specDone").classList.remove("hidden");
+      const target = document.getElementById("specDone");
+      window.scrollTo({ top: target.offsetTop - 20, behavior: "smooth" });
+    }
+  }
+  function prevWizStep() {
+    document.getElementById("specDone").classList.add("hidden");
+    if (wizIndex > 0) showWizStep(wizIndex - 1);
+  }
+  showWizStep(0);
+
+  document.querySelectorAll(".size-cards, .chips-big").forEach(group => {
     const key = group.dataset.group;
-    group.querySelectorAll(".chip").forEach(btn => {
+    group.querySelectorAll("button[data-value]").forEach(btn => {
       btn.addEventListener("click", () => {
-        group.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+        group.querySelectorAll("button[data-value]").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         state[key] = btn.dataset.value;
         renderPrice();
+        setTimeout(nextWizStep, 180);
       });
     });
   });
+  document.querySelectorAll("[data-next]").forEach(btn => btn.addEventListener("click", nextWizStep));
+  document.querySelectorAll("[data-back]").forEach(btn => btn.addEventListener("click", prevWizStep));
+  document.querySelectorAll("[data-skip]").forEach(btn => btn.addEventListener("click", () => {
+    document.getElementById("phoneInput").value = "";
+    nextWizStep();
+  }));
 
   // ---- steppers ----
   document.querySelectorAll(".stepper").forEach(step => {
@@ -706,8 +818,8 @@
     state.size = "A4"; state.color = "bw"; state.copies = 1;
     state.double = "yes"; state.cover = "no";
     state.isQuick = true;
-    document.querySelectorAll(".chips").forEach(g => {
-      g.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".size-cards, .chips-big").forEach(g => {
+      g.querySelectorAll("button[data-value]").forEach(b => b.classList.remove("active"));
       const key = g.dataset.group;
       const match = g.querySelector(`[data-value="${state[key]}"]`);
       if (match) match.classList.add("active");
@@ -717,6 +829,12 @@
       const input = s.querySelector("input");
       if (input) input.value = state[key];
     });
+    // 直接跳到完成状态，万一顾客之后按「返回修改」也能看到完整摘要
+    document.querySelectorAll(".wiz-step").forEach(el => el.classList.add("hidden"));
+    document.getElementById("specDone").classList.remove("hidden");
+    wizIndex = wizSteps.length - 1;
+    renderWizProgress();
+
     showError("formError", "");
     const { total } = calcPrice();
     document.getElementById("payAmount").textContent = `RM ${total.toFixed(2)}`;
