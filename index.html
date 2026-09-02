@@ -83,6 +83,12 @@
     color:var(--ink-soft);
     margin:0 44px 4px 0;
   }
+  .head .tag .kedai-link{
+    color:var(--ink-soft);
+    text-decoration:none;
+    border-bottom:1px dotted var(--ink-soft);
+  }
+  .head .tag .kedai-link:active{ color:var(--ink); border-color:var(--ink); }
   .head h1{
     font-family:'IBM Plex Mono', monospace;
     font-size:22px;
@@ -411,7 +417,7 @@
 
   <div class="head">
     <button type="button" class="lang-toggle" id="langToggle">BM</button>
-    <p class="tag" data-i18n="tag">KEDAI 19 · 打印服务 PRINT SERVICE</p>
+    <p class="tag"><a href="admin.html" class="kedai-link">KEDAI 19</a> · <span data-i18n="tag"></span></p>
     <h1 data-i18n="h1">打印下单 PRINT ORDER</h1>
     <p data-i18n="subtitle">上传文件 → 选规格 → 扫码付款，剩下交给我们</p>
   </div>
@@ -588,7 +594,7 @@
   // ====== i18n ======
   const T = {
     zhen: {
-      tag: "KEDAI 19 · 打印服务 PRINT SERVICE",
+      tag: "打印服务 PRINT SERVICE",
       h1: "打印下单 PRINT ORDER",
       subtitle: "上传文件 → 选规格 → 扫码付款，剩下交给我们",
       s1Title: "上传文件 UPLOAD",
@@ -648,7 +654,7 @@
       langBtn: "BM"
     },
     ms: {
-      tag: "KEDAI 19 · PERKHIDMATAN CETAK",
+      tag: "PERKHIDMATAN CETAK",
       h1: "PESANAN CETAK",
       subtitle: "Muat naik fail → pilih spesifikasi → imbas untuk bayar, selebihnya kami uruskan.",
       s1Title: "MUAT NAIK FAIL",
