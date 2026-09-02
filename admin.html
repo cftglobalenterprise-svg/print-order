@@ -162,11 +162,11 @@
     }
     #receiptArea .r-center{ text-align:center; }
     #receiptArea .r-brand{ font-size:34px; font-weight:800; letter-spacing:0.01em; margin:0; }
-    #receiptArea .r-bizline{ font-size:12px; color:#4A453B; margin-top:6px; }
+    #receiptArea .r-bizline{ font-size:12px; color:#221F1A; margin-top:6px; }
     #receiptArea .r-line{ border-top:1.5px dashed #C9BFA8; margin:18px 0; }
     #receiptArea .r-line.solid{ border-top:2.5px solid #221F1A; }
     #receiptArea .r-doctype{
-      font-size:11px; font-weight:700; letter-spacing:0.18em; color:#6B6354; margin-bottom:4px;
+      font-size:11px; font-weight:700; letter-spacing:0.18em; color:#221F1A; margin-bottom:4px;
     }
     #receiptArea .r-invno{ font-size:22px; font-weight:800; }
     #receiptArea .r-infogrid{ display:flex; gap:14px; margin:16px 0; }
@@ -174,12 +174,12 @@
       flex:1; background:#F2EEE2; padding:12px 14px;
     }
     #receiptArea .r-infobox .r-infolabel{
-      font-size:10px; font-weight:700; letter-spacing:0.1em; color:#6B6354; margin-bottom:3px;
+      font-size:10px; font-weight:700; letter-spacing:0.1em; color:#221F1A; margin-bottom:3px;
     }
     #receiptArea .r-infobox .r-infoval{ font-size:14px; font-weight:700; }
     #receiptArea table.r-items{ width:100%; border-collapse:collapse; margin-top:6px; }
     #receiptArea table.r-items th{
-      text-align:left; font-size:10.5px; letter-spacing:0.08em; color:#6B6354;
+      text-align:left; font-size:10.5px; letter-spacing:0.08em; color:#221F1A;
       border-bottom:2.5px solid #221F1A; padding:0 0 8px;
     }
     #receiptArea table.r-items th.num, #receiptArea table.r-items td.num{ text-align:right; }
@@ -205,10 +205,10 @@
     }
     #receiptArea .r-qr-box img{ width:130px; height:130px; flex-shrink:0; }
     #receiptArea .r-qr-box .r-qr-title{ font-size:15px; font-weight:800; margin-bottom:4px; }
-    #receiptArea .r-qr-box .r-qr-text{ font-size:12px; color:#4A453B; line-height:1.5; }
+    #receiptArea .r-qr-box .r-qr-text{ font-size:12px; color:#221F1A; line-height:1.5; }
     #receiptArea .r-foot{ text-align:center; margin-top:26px; }
     #receiptArea .r-foot .r-thanks{ font-size:14px; font-weight:800; letter-spacing:0.08em; }
-    #receiptArea .r-foot .r-note{ font-size:11px; color:#6B6354; margin-top:6px; }
+    #receiptArea .r-foot .r-note{ font-size:11px; color:#221F1A; margin-top:6px; }
   }
 </style>
 </head>
@@ -352,7 +352,7 @@
     name: "KEDAI 19",
     address: "No 19, Bandar Baru Brinchang, 39100 Brinchang, Pahang",
     phone: "+6011-3335 1400",
-    hours: "9:00 AM - 9:30 PM Daily",
+    hours: "10:00 AM - 10:00 PM Daily",
     ssm: "202203221872 (NS0273693-A)",
     orderUrl: "https://cftglobalenterprise-svg.github.io/print-order/"
   };
@@ -395,6 +395,7 @@
         <div class="r-brand">${BIZ.name}</div>
         <div class="r-bizline">${BIZ.address}</div>
         <div class="r-bizline">Tel: ${BIZ.phone} &nbsp;|&nbsp; Hours: ${BIZ.hours}</div>
+        <div class="r-bizline">KEDAI 19 adalah nama perniagaan dimiliki oleh CFT GLOBAL ENTERPRISE</div>
         <div class="r-bizline">SSM No: ${BIZ.ssm}</div>
       </div>
 
