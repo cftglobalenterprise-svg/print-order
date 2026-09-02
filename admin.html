@@ -77,6 +77,8 @@
   .badge.printed{ background:var(--printed-bg); color:var(--printed); }
   .badge.collected{ background:var(--collected-bg); color:var(--collected); }
   .badge.quick{ background:#F3E3D0; color:var(--stamp); }
+  .badge.pay-online{ background:var(--paid-bg); color:var(--paid); }
+  .badge.pay-store{ background:#F3E3D0; color:#B57A17; }
 
   .empty{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:13px; }
 
@@ -193,6 +195,7 @@
               <span class="oid">#${o.id.slice(0,8).toUpperCase()}</span>
               <span class="badge ${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
               ${o.notes ? '<span class="badge quick">⚡ 待确认</span>' : ''}
+              <span class="badge ${o.payment_method === 'online_claimed' ? 'pay-online' : 'pay-store'}">${o.payment_method === 'online_claimed' ? '💳 待核实付款' : '🏪 到店付款'}</span>
               <div class="time">${t}</div>
             </div>
             <div class="price">RM ${Number(o.price).toFixed(2)}</div>
