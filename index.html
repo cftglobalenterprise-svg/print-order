@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
@@ -61,13 +61,27 @@
   .head{
     padding:22px 22px 16px;
     text-align:left;
+    position:relative;
   }
+  .lang-toggle{
+    position:absolute;
+    top:16px; right:16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; font-weight:700;
+    padding:6px 10px;
+    border:1.3px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    letter-spacing:0.03em;
+  }
+  .lang-toggle:active{ background:var(--ink); color:var(--paper); }
   .head .tag{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
     letter-spacing:0.08em;
     color:var(--ink-soft);
-    margin:0 0 4px;
+    margin:0 44px 4px 0;
   }
   .head h1{
     font-family:'IBM Plex Mono', monospace;
@@ -169,29 +183,6 @@
     color:var(--ink-soft);
     line-height:1.5;
   }
-  .howto-toggle{
-    display:block;
-    width:100%;
-    text-align:left;
-    background:none;
-    border:none;
-    color:var(--printed, #3D6FA6);
-    font-family:'IBM Plex Sans', sans-serif;
-    font-size:12.5px;
-    text-decoration:underline;
-    cursor:pointer;
-    padding:10px 0 0;
-  }
-  .howto-box{
-    margin-top:8px;
-    background:var(--paper-deep);
-    border:1px solid var(--line);
-    padding:10px 12px;
-    font-size:12.5px;
-    line-height:1.7;
-  }
-  .howto-box b{ display:block; margin-bottom:4px; }
-  .howto-box ol{ margin:0; padding-left:18px; }
   .quick-btn{
     margin-top:12px;
     font-size:13px;
@@ -203,30 +194,6 @@
     animation:spin .7s linear infinite;
   }
 
-  /* option rows */
-  .opt-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 0;
-    border-bottom:1px solid rgba(201,191,168,0.6);
-  }
-  .opt-row:last-child{ border-bottom:none; }
-  .opt-label{ font-size:14px; font-weight:500; }
-  .chips{ display:flex; gap:6px; }
-  .chip{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
-    padding:7px 12px;
-    border:1.3px solid var(--ink);
-    background:transparent;
-    color:var(--ink);
-    cursor:pointer;
-  }
-  .chip.active{
-    background:var(--ink);
-    color:var(--paper);
-  }
   .stepper{ display:flex; align-items:center; gap:0; border:1.3px solid var(--ink); }
   .stepper button{
     width:30px; height:30px;
@@ -281,8 +248,8 @@
 
   .chips-big{ display:flex; gap:10px; margin-bottom:6px; }
   .chip-big{
-    flex:1; font-family:'IBM Plex Mono', monospace; font-size:14px; font-weight:600;
-    padding:16px 10px; border:1.3px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer;
+    flex:1; font-family:'IBM Plex Mono', monospace; font-size:13.5px; font-weight:600;
+    padding:16px 8px; border:1.3px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer;
   }
   .chip-big.active{ background:var(--ink); color:var(--paper); }
 
@@ -420,9 +387,10 @@
 <div class="ticket">
 
   <div class="head">
-    <p class="tag">KEDAI 19 · PRINT SERVICE</p>
-    <h1>PRINT ORDER</h1>
-    <p>Upload your files, pick your options, scan to pay — we handle the rest.</p>
+    <button type="button" class="lang-toggle" id="langToggle">BM</button>
+    <p class="tag" data-i18n="tag">KEDAI 19 · 打印服务 PRINT SERVICE</p>
+    <h1 data-i18n="h1">打印下单 PRINT ORDER</h1>
+    <p data-i18n="subtitle">上传文件 → 选规格 → 扫码付款，剩下交给我们</p>
   </div>
 
   <div class="perf"></div>
@@ -431,41 +399,30 @@
   <div id="formView">
 
     <div class="section">
-      <h2><span class="no">01</span>UPLOAD FILES</h2>
+      <h2><span class="no">01</span><span data-i18n="s1Title">上传文件 UPLOAD</span></h2>
       <div class="drop" id="dropZone">
         <span class="icon">📎</span>
-        <div class="main">Tap to choose files (you can pick more than one)</div>
-        <div class="sub">PDF / JPG / PNG / DOC / DOCX supported, max 50MB each</div>
+        <div class="main" data-i18n="dropMain">点击选择文件（可一次选多个）</div>
+        <div class="sub" data-i18n="dropSub">支持 PDF / JPG / PNG / DOC / DOCX，单个最大 50MB</div>
       </div>
       <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
       <div class="file-list" id="fileList"></div>
       <div class="files-total hidden" id="filesTotal"></div>
 
-      <button type="button" class="howto-toggle" id="howtoToggle">💬 Files in WhatsApp? Tap here for a quick way to send them</button>
-      <div class="howto-box hidden" id="howtoBox">
-        <b>Send many files at once (no need to tap one by one):</b>
-        <ol>
-          <li>Long-press the first file in your WhatsApp chat</li>
-          <li>Keep tapping other files (select dozens at once if you like)</li>
-          <li>Tap Share → choose "Save to Files" (iPhone) or "Save as" (Android)</li>
-          <li>Come back here, tap Upload → choose "Select All" to grab them all at once</li>
-        </ol>
-      </div>
+      <button type="button" class="btn stamp quick-btn hidden" id="quickBtn" data-i18n="quickBtn">⚡ 极速下单（用默认设置，事后我们再跟你确认）</button>
 
-      <button type="button" class="btn stamp quick-btn hidden" id="quickBtn">⚡ Quick Order (default settings, we'll confirm with you after)</button>
-
-      <p class="hint-save">📌 If your files are in WhatsApp or Email, save them to your phone first, then come back here to upload. You can upload several photos or PDFs at once.</p>
+      <p class="hint-save" data-i18n="hintSave">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。</p>
     </div>
 
     <div class="perf"></div>
 
     <div class="section">
-      <h2><span class="no">02</span>PRINT SPEC</h2>
+      <h2><span class="no">02</span><span data-i18n="s2Title">打印规格 SPEC</span></h2>
 
       <div class="wiz-progress" id="wizProgress"></div>
 
       <div class="wiz-step" data-step="size">
-        <p class="wiz-q">Choose paper size</p>
+        <p class="wiz-q" data-i18n="qSize">选择纸张尺寸</p>
         <div class="size-cards" data-group="size">
           <button type="button" class="size-card" data-value="A5">
             <span class="size-rect" style="width:25px;height:35px;"></span>
@@ -486,16 +443,16 @@
       </div>
 
       <div class="wiz-step hidden" data-step="color">
-        <p class="wiz-q">Black &amp; white or color?</p>
+        <p class="wiz-q" data-i18n="qColor">黑白还是彩色？</p>
         <div class="chips-big" data-group="color">
-          <button type="button" class="chip-big active" data-value="bw">B&amp;W</button>
-          <button type="button" class="chip-big" data-value="color">Color</button>
+          <button type="button" class="chip-big active" data-value="bw" data-i18n="optBw">黑白</button>
+          <button type="button" class="chip-big" data-value="color" data-i18n="optColor">彩色</button>
         </div>
-        <button type="button" class="wiz-back" data-back>← Back</button>
+        <button type="button" class="wiz-back" data-back data-i18n="back">← 上一步</button>
       </div>
 
       <div class="wiz-step hidden" data-step="copies">
-        <p class="wiz-q">How many copies?</p>
+        <p class="wiz-q" data-i18n="qCopies">要印几份？</p>
         <div style="display:flex; justify-content:center; margin-bottom:14px;">
           <div class="stepper big" data-group="copies">
             <button type="button" data-dir="-1">−</button>
@@ -503,34 +460,34 @@
             <button type="button" data-dir="1">+</button>
           </div>
         </div>
-        <button type="button" class="btn stamp wiz-next" data-next>Next →</button>
-        <button type="button" class="wiz-back" data-back>← Back</button>
+        <button type="button" class="btn stamp wiz-next" data-next data-i18n="next">下一步 →</button>
+        <button type="button" class="wiz-back" data-back data-i18n="back">← 上一步</button>
       </div>
 
       <div class="wiz-step hidden" data-step="double">
-        <p class="wiz-q">Double-sided printing?</p>
+        <p class="wiz-q" data-i18n="qDouble">要双面打印吗？</p>
         <div class="chips-big" data-group="double">
-          <button type="button" class="chip-big" data-value="no">Single-sided</button>
-          <button type="button" class="chip-big active" data-value="yes">Double-sided</button>
+          <button type="button" class="chip-big" data-value="no" data-i18n="optSingle">单面</button>
+          <button type="button" class="chip-big active" data-value="yes" data-i18n="optDouble">双面</button>
         </div>
-        <button type="button" class="wiz-back" data-back>← Back</button>
+        <button type="button" class="wiz-back" data-back data-i18n="back">← 上一步</button>
       </div>
 
       <div class="wiz-step hidden" data-step="cover">
-        <p class="wiz-q">Need lamination?</p>
+        <p class="wiz-q" data-i18n="qCover">需要过胶吗？</p>
         <div class="chips-big" data-group="cover">
-          <button type="button" class="chip-big active" data-value="no">No</button>
-          <button type="button" class="chip-big" data-value="yes">Yes, laminate</button>
+          <button type="button" class="chip-big active" data-value="no" data-i18n="optNo">不用</button>
+          <button type="button" class="chip-big" data-value="yes" data-i18n="optYesCover">要过胶</button>
         </div>
-        <button type="button" class="wiz-back" data-back>← Back</button>
+        <button type="button" class="wiz-back" data-back data-i18n="back">← 上一步</button>
       </div>
 
       <div class="wiz-step hidden" data-step="phone">
-        <p class="wiz-q">Phone number (so we can reach you when it's ready)</p>
+        <p class="wiz-q" data-i18n="qPhone">联系电话（方便通知你取件）</p>
         <input type="tel" id="phoneInput" placeholder="012-3456789">
-        <button type="button" class="btn stamp wiz-next" data-next>Done →</button>
-        <button type="button" class="wiz-skip" data-skip>Skip, no phone number</button>
-        <button type="button" class="wiz-back" data-back>← Back</button>
+        <button type="button" class="btn stamp wiz-next" data-next data-i18n="done">完成 →</button>
+        <button type="button" class="wiz-skip" data-skip data-i18n="skip">跳过，不留电话</button>
+        <button type="button" class="wiz-back" data-back data-i18n="back">← 上一步</button>
       </div>
     </div>
 
@@ -538,13 +495,13 @@
       <div class="perf"></div>
 
       <div class="total-block">
-        <div class="total-row"><span id="priceBreak1">A4 B&amp;W × 1 pg × 1 copy</span><span id="priceBreak1v">RM 0.50</span></div>
-        <div class="total-row hidden" id="priceBreak2Row"><span>Lamination</span><span id="priceBreak2v">RM 0.00</span></div>
-        <div class="total-row main"><span>TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
+        <div class="total-row"><span id="priceBreak1"></span><span id="priceBreak1v">RM 0.50</span></div>
+        <div class="total-row hidden" id="priceBreak2Row"><span data-i18n="lamination">过胶</span><span id="priceBreak2v">RM 0.00</span></div>
+        <div class="total-row main"><span data-i18n="total">总额 TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
       </div>
 
       <div class="actions">
-        <button class="btn stamp" id="toPaymentBtn">Next: Payment →</button>
+        <button class="btn stamp" id="toPaymentBtn" data-i18n="toPayment">下一步：付款 →</button>
         <p class="error-msg" id="formError"></p>
       </div>
     </div>
@@ -553,22 +510,22 @@
   <!-- ============ STEP 2: PAYMENT ============ -->
   <div id="payView" class="hidden">
     <div class="section">
-      <h2><span class="no">03</span>SCAN TO PAY</h2>
+      <h2><span class="no">03</span><span data-i18n="s3Title">扫码付款 PAY</span></h2>
       <div class="qr-wrap">
         <img src="assets/duitnow-qr.jpg" alt="DuitNow QR">
       </div>
       <div class="qr-amount" id="payAmount">RM 0.50</div>
-      <div class="qr-note">DuitNow QR · Scan with any banking app or e-wallet</div>
+      <div class="qr-note" data-i18n="qrNote">DuitNow QR · 任何银行 App / e-wallet 都可扫</div>
     </div>
     <div class="perf"></div>
     <div class="actions">
       <button class="btn stamp" id="paidBtn">
-        <span id="paidBtnText">✓ I've paid, submit order</span>
+        <span id="paidBtnText" data-i18n="paidBtn">✓ 我已经付款，提交订单</span>
       </button>
       <button class="btn outline" id="payAtStoreBtn">
-        <span id="payAtStoreBtnText">🏪 Pay at the store, submit now</span>
+        <span id="payAtStoreBtnText" data-i18n="storeBtn">🏪 到店再付款，先提交订单</span>
       </button>
-      <button class="btn secondary" id="backBtn">← Back to edit</button>
+      <button class="btn secondary" id="backBtn" data-i18n="backEdit">← 返回修改</button>
       <p class="error-msg" id="payError"></p>
     </div>
   </div>
@@ -576,10 +533,10 @@
   <!-- ============ STEP 3: DONE ============ -->
   <div id="doneView" class="hidden">
     <div class="done-block">
-      <div class="stampmark">SUBMITTED</div>
-      <h3>Order received</h3>
-      <p>We'll verify payment and start printing</p>
-      <p>We'll contact you at your number once it's ready</p>
+      <div class="stampmark" data-i18n="submitted">已提交 SUBMITTED</div>
+      <h3 data-i18n="received">订单已收到</h3>
+      <p data-i18n="doneP1">我们会核实付款后开始打印</p>
+      <p data-i18n="doneP2">好了会用你的号码联系你取件</p>
       <div class="oid" id="orderIdShow"></div>
     </div>
   </div>
@@ -606,6 +563,128 @@
 
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  // ====== i18n ======
+  const T = {
+    zhen: {
+      tag: "KEDAI 19 · 打印服务 PRINT SERVICE",
+      h1: "打印下单 PRINT ORDER",
+      subtitle: "上传文件 → 选规格 → 扫码付款，剩下交给我们",
+      s1Title: "上传文件 UPLOAD",
+      dropMain: "点击选择文件（可一次选多个）",
+      dropMainMore: "+ 继续添加文件",
+      dropSub: "支持 PDF / JPG / PNG / DOC / DOCX，单个最大 50MB",
+      quickBtn: "⚡ 极速下单（用默认设置，事后我们再跟你确认）",
+      hintSave: "📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。",
+      s2Title: "打印规格 SPEC",
+      qSize: "选择纸张尺寸",
+      qColor: "黑白还是彩色？",
+      optBw: "黑白", optColor: "彩色",
+      back: "← 上一步",
+      qCopies: "要印几份？",
+      next: "下一步 →",
+      qDouble: "要双面打印吗？",
+      optSingle: "单面", optDouble: "双面",
+      qCover: "需要过胶吗？",
+      optNo: "不用", optYesCover: "要过胶",
+      qPhone: "联系电话（方便通知你取件）",
+      done: "完成 →",
+      skip: "跳过，不留电话",
+      lamination: "过胶",
+      total: "总额 TOTAL",
+      toPayment: "下一步：付款 →",
+      s3Title: "扫码付款 PAY",
+      qrNote: "DuitNow QR · 任何银行 App / e-wallet 都可扫",
+      paidBtn: "✓ 我已经付款，提交订单",
+      storeBtn: "🏪 到店再付款，先提交订单",
+      backEdit: "← 返回修改",
+      submitted: "已提交 SUBMITTED",
+      received: "订单已收到",
+      doneP1: "我们会核实付款后开始打印",
+      doneP2: "好了会用你的号码联系你取件",
+      orderPrefix: "订单号 #",
+      submitting: "提交中...",
+      detecting: "识别页数中...",
+      autoDetected: "✓ 自动识别",
+      imagePage: "🖼️ 图片 · 按1页算",
+      manualPage: "⚠️ 请手动确认页数",
+      remove: "移除 ✕",
+      filesTotal: (n, p) => `共 ${n} 个文件 · 合计 ${p} 页`,
+      needFiles: "请先上传要打印的文件",
+      stillDetecting: "文件还在识别中，请稍等一下",
+      tooLarge: (name) => `"${name}" 太大了，单个文件最大 50MB`,
+      submitFailed: (msg) => `提交失败，请检查网络后重试 (${msg})`,
+      priceLine: (size, color, pages, copies) => `${size} ${color} × ${pages}页 × ${copies}份`,
+      langBtn: "BM"
+    },
+    ms: {
+      tag: "KEDAI 19 · PERKHIDMATAN CETAK",
+      h1: "PESANAN CETAK",
+      subtitle: "Muat naik fail → pilih spesifikasi → imbas untuk bayar, selebihnya kami uruskan.",
+      s1Title: "MUAT NAIK FAIL",
+      dropMain: "Ketik untuk pilih fail (boleh pilih banyak sekali gus)",
+      dropMainMore: "+ Tambah fail lagi",
+      dropSub: "Sokong PDF / JPG / PNG / DOC / DOCX, maksimum 50MB setiap fail",
+      quickBtn: "⚡ Pesanan Pantas (guna tetapan asal, kami sahkan dengan anda selepas ini)",
+      hintSave: "📌 Kalau fail ada dalam WhatsApp / Email, simpan dulu ke telefon anda, kemudian kembali sini untuk muat naik. Boleh muat naik banyak gambar atau PDF sekali gus.",
+      s2Title: "SPESIFIKASI CETAKAN",
+      qSize: "Pilih saiz kertas",
+      qColor: "Hitam putih atau warna?",
+      optBw: "Hitam Putih", optColor: "Warna",
+      back: "← Kembali",
+      qCopies: "Berapa banyak salinan?",
+      next: "Seterusnya →",
+      qDouble: "Cetak dua muka?",
+      optSingle: "Satu Muka", optDouble: "Dua Muka",
+      qCover: "Perlu laminasi?",
+      optNo: "Tak Perlu", optYesCover: "Ya, Laminate",
+      qPhone: "Nombor telefon (supaya kami boleh maklum bila siap)",
+      done: "Selesai →",
+      skip: "Langkau, tiada nombor telefon",
+      lamination: "Laminasi",
+      total: "JUMLAH",
+      toPayment: "Seterusnya: Bayaran →",
+      s3Title: "IMBAS UNTUK BAYAR",
+      qrNote: "DuitNow QR · Imbas dengan mana-mana app bank / e-wallet",
+      paidBtn: "✓ Saya dah bayar, hantar pesanan",
+      storeBtn: "🏪 Bayar di kedai, hantar pesanan dulu",
+      backEdit: "← Kembali ubah",
+      submitted: "DIHANTAR",
+      received: "Pesanan diterima",
+      doneP1: "Kami akan sahkan bayaran sebelum mula mencetak",
+      doneP2: "Kami akan hubungi anda di nombor tersebut apabila siap",
+      orderPrefix: "Pesanan #",
+      submitting: "Menghantar...",
+      detecting: "Mengesan bilangan muka surat...",
+      autoDetected: "✓ Dikesan automatik",
+      imagePage: "🖼️ Gambar · dikira 1 muka surat",
+      manualPage: "⚠️ Sila sahkan bilangan muka surat",
+      remove: "Buang ✕",
+      filesTotal: (n, p) => `${n} fail · jumlah ${p} muka surat`,
+      needFiles: "Sila muat naik fail dahulu",
+      stillDetecting: "Fail sedang diproses, sila tunggu sebentar",
+      tooLarge: (name) => `"${name}" terlalu besar — maksimum 50MB setiap fail`,
+      submitFailed: (msg) => `Penghantaran gagal, sila semak sambungan dan cuba lagi (${msg})`,
+      priceLine: (size, color, pages, copies) => `${size} ${color} × ${pages} muka × ${copies} salinan`,
+      langBtn: "中/EN"
+    }
+  };
+  let currentLang = "zhen";
+
+  function applyLang() {
+    const dict = T[currentLang];
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.dataset.i18n;
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.getElementById("langToggle").textContent = dict.langBtn;
+    renderFileList();
+    renderPrice();
+  }
+  document.getElementById("langToggle").addEventListener("click", () => {
+    currentLang = currentLang === "zhen" ? "ms" : "zhen";
+    applyLang();
+  });
 
   const state = {
     size: "A4", color: "bw", copies: 1,
@@ -692,32 +771,33 @@
   }
 
   function renderFileList() {
+    const dict = T[currentLang];
     if (state.files.length === 0) {
       fileList.innerHTML = "";
       filesTotal.classList.add("hidden");
       dropZone.classList.remove("compact");
-      dropZone.querySelector(".main").textContent = "Tap to choose files (you can pick more than one)";
+      dropZone.querySelector(".main").textContent = dict.dropMain;
       return;
     }
     dropZone.classList.add("compact");
-    dropZone.querySelector(".main").textContent = "+ Add more files";
+    dropZone.querySelector(".main").textContent = dict.dropMainMore;
 
     fileList.innerHTML = state.files.map(f => {
       let statusHtml, statusCls = "";
       if (f.status === "detecting") {
-        statusHtml = '<span class="spin-sm"></span> Detecting pages...';
+        statusHtml = `<span class="spin-sm"></span> ${dict.detecting}`;
       } else if (f.status === "ok") {
-        statusHtml = "✓ Auto-detected"; statusCls = "ok";
+        statusHtml = dict.autoDetected; statusCls = "ok";
       } else if (f.status === "image") {
-        statusHtml = "🖼️ Image · counted as 1 page";
+        statusHtml = dict.imagePage;
       } else {
-        statusHtml = "⚠️ Please confirm page count manually";
+        statusHtml = dict.manualPage;
       }
       return `
         <div class="file-row" data-id="${f.id}">
           <div class="file-row-top">
             <span class="file-row-name">${f.file.name}</span>
-            <button type="button" class="file-row-remove" data-id="${f.id}">Remove ✕</button>
+            <button type="button" class="file-row-remove" data-id="${f.id}">${dict.remove}</button>
           </div>
           <div class="file-row-bottom">
             <span class="file-row-status ${statusCls}">${statusHtml}</span>
@@ -732,7 +812,7 @@
     }).join("");
 
     filesTotal.classList.remove("hidden");
-    filesTotal.textContent = `${state.files.length} file(s) · ${totalPages()} page(s) total`;
+    filesTotal.textContent = dict.filesTotal(state.files.length, totalPages());
 
     fileList.querySelectorAll(".file-row-remove").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -785,7 +865,7 @@
   function addFiles(fileArr) {
     for (const f of fileArr) {
       if (f.size > 50 * 1024 * 1024) {
-        showError("formError", `"${f.name}" is too large — max 50MB per file`);
+        showError("formError", T[currentLang].tooLarge(f.name));
         continue;
       }
       const entry = { id: "f" + (fileSeq++), file: f, pages: 1, status: "detecting" };
@@ -805,15 +885,10 @@
     }
   });
 
-  // ---- how-to box ----
-  document.getElementById("howtoToggle").addEventListener("click", () => {
-    document.getElementById("howtoBox").classList.toggle("hidden");
-  });
-
   // ---- quick order ----
   document.getElementById("quickBtn").addEventListener("click", () => {
-    if (state.files.length === 0) { showError("formError", "Please upload your files first"); return; }
-    if (state.files.some(f => f.status === "detecting")) { showError("formError", "Files are still being processed, please wait a moment"); return; }
+    if (state.files.length === 0) { showError("formError", T[currentLang].needFiles); return; }
+    if (state.files.some(f => f.status === "detecting")) { showError("formError", T[currentLang].stillDetecting); return; }
     // 重置成默认设置
     state.size = "A4"; state.color = "bw"; state.copies = 1;
     state.double = "yes"; state.cover = "no";
@@ -881,11 +956,10 @@
     return { base, cover, total: base + cover, pages };
   }
   function renderPrice() {
+    const dict = T[currentLang];
     const { base, cover, total, pages } = calcPrice();
-    const sizeLabel = state.size;
-    const colorLabel = state.color === "bw" ? "B&W" : "Color";
-    document.getElementById("priceBreak1").textContent =
-      `${sizeLabel} ${colorLabel} × ${pages} pg × ${state.copies} copy`;
+    const colorLabel = state.color === "bw" ? dict.optBw : dict.optColor;
+    document.getElementById("priceBreak1").textContent = dict.priceLine(state.size, colorLabel, pages, state.copies);
     document.getElementById("priceBreak1v").textContent = `RM ${base.toFixed(2)}`;
     const row2 = document.getElementById("priceBreak2Row");
     if (cover > 0) {
@@ -896,7 +970,7 @@
     }
     document.getElementById("totalPrice").textContent = `RM ${total.toFixed(2)}`;
   }
-  renderPrice();
+  applyLang();
 
   function showError(id, msg) {
     const el = document.getElementById(id);
@@ -906,8 +980,8 @@
 
   // ---- step 1 -> step 2 ----
   document.getElementById("toPaymentBtn").addEventListener("click", () => {
-    if (state.files.length === 0) { showError("formError", "Please upload your files first"); return; }
-    if (state.files.some(f => f.status === "detecting")) { showError("formError", "Files are still being processed, please wait a moment"); return; }
+    if (state.files.length === 0) { showError("formError", T[currentLang].needFiles); return; }
+    if (state.files.some(f => f.status === "detecting")) { showError("formError", T[currentLang].stillDetecting); return; }
     state.isQuick = false;
     showError("formError", "");
     const { total } = calcPrice();
@@ -924,6 +998,7 @@
 
   // ---- submit order ----
   async function submitOrder(paymentMethod) {
+    const dict = T[currentLang];
     const paidBtn = document.getElementById("paidBtn");
     const storeBtn = document.getElementById("payAtStoreBtn");
     const paidBtnText = document.getElementById("paidBtnText");
@@ -931,9 +1006,9 @@
     paidBtn.disabled = true;
     storeBtn.disabled = true;
     if (paymentMethod === "online_claimed") {
-      paidBtnText.innerHTML = '<span class="spinner"></span> Submitting...';
+      paidBtnText.innerHTML = `<span class="spinner"></span> ${dict.submitting}`;
     } else {
-      storeBtnText.innerHTML = '<span class="spinner"></span> Submitting...';
+      storeBtnText.innerHTML = `<span class="spinner"></span> ${dict.submitting}`;
     }
     showError("payError", "");
 
@@ -975,18 +1050,18 @@
       notifyWhatsApp(orderData, total, paymentMethod);
 
       document.getElementById("orderIdShow").textContent =
-        "Order #" + orderData.id.slice(0, 8).toUpperCase();
+        dict.orderPrefix + orderData.id.slice(0, 8).toUpperCase();
       document.getElementById("payView").classList.add("hidden");
       document.getElementById("doneView").classList.remove("hidden");
       window.scrollTo(0,0);
 
     } catch (err) {
       console.error(err);
-      showError("payError", "Submission failed, please check your connection and try again (" + (err.message || err) + ")");
+      showError("payError", dict.submitFailed(err.message || err));
       paidBtn.disabled = false;
       storeBtn.disabled = false;
-      paidBtnText.textContent = "✓ I've paid, submit order";
-      storeBtnText.textContent = "🏪 Pay at the store, submit now";
+      paidBtnText.textContent = dict.paidBtn;
+      storeBtnText.textContent = dict.storeBtn;
     }
   }
 
