@@ -110,43 +110,63 @@
   .drop .icon{ font-size:26px; display:block; margin-bottom:6px; }
   .drop .main{ font-size:14px; font-weight:600; }
   .drop .sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+  .drop.compact{ padding:12px 14px; }
+  .drop.compact .icon{ font-size:16px; display:inline; margin:0 6px 0 0; }
+  .drop.compact .main{ display:inline; font-size:13px; }
+  .drop.compact .sub{ display:none; }
   #fileInput{ display:none; }
-  .file-chip{
-    margin-top:10px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
+
+  .file-list{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .file-row{
     background:var(--paper-deep);
     border:1px solid var(--line);
-    padding:8px 10px;
-    display:none;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
+    padding:9px 10px;
   }
-  .file-chip.show{ display:flex; }
-  .file-chip button{
+  .file-row-top{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+  }
+  .file-row-name{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    flex:1;
+  }
+  .file-row-remove{
     background:none; border:none; color:var(--stamp);
     font-family:'IBM Plex Mono', monospace; font-size:12px; cursor:pointer;
-    padding:2px 4px;
+    padding:2px 4px; flex-shrink:0;
   }
+  .file-row-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:6px;
+  }
+  .file-row-status{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft);
+    display:flex; align-items:center; gap:5px;
+  }
+  .file-row-status.ok{ color:var(--paid); }
+  .mini-stepper{ display:flex; align-items:center; border:1.3px solid var(--ink); }
+  .mini-stepper button{
+    width:22px; height:22px; background:transparent; border:none;
+    font-size:13px; font-weight:600; cursor:pointer; color:var(--ink);
+  }
+  .mini-stepper span{
+    width:26px; text-align:center;
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    border-left:1.3px solid var(--ink); border-right:1.3px solid var(--ink);
+    height:22px; line-height:22px;
+  }
+  .files-total{
+    margin-top:8px; text-align:right;
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft);
+  }
+
   .hint-save{
     margin-top:8px;
     font-size:11.5px;
     color:var(--ink-soft);
     line-height:1.5;
   }
-  .page-detect{
-    margin-top:6px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    display:none;
-    align-items:center;
-    gap:6px;
-  }
-  .page-detect.show{ display:flex; }
-  .page-detect.ok{ color:var(--paid); }
-  .page-detect.warn{ color:var(--ink-soft); }
-  .page-detect .spin-sm{
+  .spin-sm{
     width:11px;height:11px;border:2px solid var(--ink-soft);
     border-top-color:transparent; border-radius:50%;
     animation:spin .7s linear infinite;
@@ -330,16 +350,13 @@
       <h2><span class="no">01</span>上传文件 UPLOAD</h2>
       <div class="drop" id="dropZone">
         <span class="icon">📎</span>
-        <div class="main">点击选择文件</div>
-        <div class="sub">支持 PDF / JPG / PNG / DOC / DOCX，最大 50MB</div>
+        <div class="main">点击选择文件（可一次选多个）</div>
+        <div class="sub">支持 PDF / JPG / PNG / DOC / DOCX，单个最大 50MB</div>
       </div>
-      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-      <div class="file-chip" id="fileChip">
-        <span id="fileName"></span>
-        <button type="button" id="fileRemove">移除 ✕</button>
-      </div>
-      <div class="page-detect" id="pageDetect"></div>
-      <p class="hint-save">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。</p>
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+      <div class="file-list" id="fileList"></div>
+      <div class="files-total hidden" id="filesTotal"></div>
+      <p class="hint-save">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。</p>
     </div>
 
     <div class="perf"></div>
@@ -360,15 +377,6 @@
         <div class="chips" data-group="color">
           <button class="chip active" data-value="bw">黑白</button>
           <button class="chip" data-value="color">彩色</button>
-        </div>
-      </div>
-
-      <div class="opt-row">
-        <span class="opt-label">文件页数 Pages</span>
-        <div class="stepper" data-group="pages">
-          <button type="button" data-dir="-1">−</button>
-          <input type="text" value="1" inputmode="numeric" readonly id="pagesInput">
-          <button type="button" data-dir="1">+</button>
         </div>
       </div>
 
@@ -471,9 +479,10 @@
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
   const state = {
-    size: "A4", color: "bw", pages: 1, copies: 1,
-    double: "yes", cover: "no", file: null
+    size: "A4", color: "bw", copies: 1,
+    double: "yes", cover: "no", files: []
   };
+  let fileSeq = 0;
 
   // ---- chip groups ----
   document.querySelectorAll(".chips").forEach(group => {
@@ -508,97 +517,141 @@
   // ---- upload ----
   const dropZone = document.getElementById("dropZone");
   const fileInput = document.getElementById("fileInput");
-  const fileChip = document.getElementById("fileChip");
-  const fileName = document.getElementById("fileName");
+  const fileList = document.getElementById("fileList");
+  const filesTotal = document.getElementById("filesTotal");
 
-  const pageDetect = document.getElementById("pageDetect");
-  const pagesInput = document.getElementById("pagesInput");
-
-  function setPages(n) {
-    state.pages = n;
-    pagesInput.value = n;
-    renderPrice();
+  function totalPages() {
+    return state.files.reduce((sum, f) => sum + f.pages, 0);
   }
 
-  function showDetect(html, cls) {
-    pageDetect.innerHTML = html;
-    pageDetect.className = "page-detect show" + (cls ? " " + cls : "");
-  }
-  function hideDetect() {
-    pageDetect.className = "page-detect";
-    pageDetect.innerHTML = "";
+  function renderFileList() {
+    if (state.files.length === 0) {
+      fileList.innerHTML = "";
+      filesTotal.classList.add("hidden");
+      dropZone.classList.remove("compact");
+      dropZone.querySelector(".main").textContent = "点击选择文件（可一次选多个）";
+      return;
+    }
+    dropZone.classList.add("compact");
+    dropZone.querySelector(".main").textContent = "+ 继续添加文件";
+
+    fileList.innerHTML = state.files.map(f => {
+      let statusHtml, statusCls = "";
+      if (f.status === "detecting") {
+        statusHtml = '<span class="spin-sm"></span> 识别页数中...';
+      } else if (f.status === "ok") {
+        statusHtml = "✓ 自动识别"; statusCls = "ok";
+      } else if (f.status === "image") {
+        statusHtml = "🖼️ 图片 · 按1页算";
+      } else {
+        statusHtml = "⚠️ 请手动确认页数";
+      }
+      return `
+        <div class="file-row" data-id="${f.id}">
+          <div class="file-row-top">
+            <span class="file-row-name">${f.file.name}</span>
+            <button type="button" class="file-row-remove" data-id="${f.id}">移除 ✕</button>
+          </div>
+          <div class="file-row-bottom">
+            <span class="file-row-status ${statusCls}">${statusHtml}</span>
+            <div class="mini-stepper" data-id="${f.id}">
+              <button type="button" data-dir="-1">−</button>
+              <span>${f.pages}</span>
+              <button type="button" data-dir="1">+</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    filesTotal.classList.remove("hidden");
+    filesTotal.textContent = `共 ${state.files.length} 个文件 · 合计 ${totalPages()} 页`;
+
+    fileList.querySelectorAll(".file-row-remove").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.files = state.files.filter(f => f.id !== btn.dataset.id);
+        renderFileList();
+        renderPrice();
+      });
+    });
+    fileList.querySelectorAll(".mini-stepper").forEach(step => {
+      const id = step.dataset.id;
+      step.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const f = state.files.find(x => x.id === id);
+          if (!f) return;
+          const dir = parseInt(btn.dataset.dir, 10);
+          f.pages = Math.max(1, Math.min(999, f.pages + dir));
+          renderFileList();
+          renderPrice();
+        });
+      });
+    });
   }
 
-  async function detectPages(file) {
+  async function detectPagesFor(entry) {
+    const file = entry.file;
     const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
     const isImage = file.type.startsWith("image/");
 
     if (isImage) {
-      setPages(1);
-      showDetect("🖼️ 图片文件，按 1 页算", "warn");
+      entry.pages = 1; entry.status = "image";
+      renderFileList(); renderPrice();
       return;
     }
-
     if (isPdf) {
-      showDetect('<span class="spin-sm"></span> 正在识别PDF页数...', "warn");
       try {
         const buf = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-        setPages(pdf.numPages);
-        showDetect(`✓ 自动识别：共 ${pdf.numPages} 页`, "ok");
+        entry.pages = pdf.numPages; entry.status = "ok";
       } catch (err) {
         console.error(err);
-        setPages(1);
-        showDetect("⚠️ 无法自动识别，请手动调整下面的页数", "warn");
+        entry.pages = 1; entry.status = "manual";
       }
+      renderFileList(); renderPrice();
       return;
     }
+    entry.pages = 1; entry.status = "manual";
+    renderFileList(); renderPrice();
+  }
 
-    // doc / docx / 其他类型：没办法在网页里自动数页
-    setPages(1);
-    showDetect("⚠️ 这类文件无法自动识别页数，请手动调整下面的页数", "warn");
+  function addFiles(fileArr) {
+    for (const f of fileArr) {
+      if (f.size > 50 * 1024 * 1024) {
+        showError("formError", `"${f.name}" 太大了，单个文件最大 50MB`);
+        continue;
+      }
+      const entry = { id: "f" + (fileSeq++), file: f, pages: 1, status: "detecting" };
+      state.files.push(entry);
+      detectPagesFor(entry);
+    }
+    showError("formError", "");
+    renderFileList();
+    renderPrice();
   }
 
   dropZone.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", () => {
-    if (fileInput.files && fileInput.files[0]) {
-      const f = fileInput.files[0];
-      if (f.size > 50 * 1024 * 1024) {
-        showError("formError", "文件太大了，最大 50MB");
-        fileInput.value = "";
-        return;
-      }
-      state.file = f;
-      fileName.textContent = f.name;
-      fileChip.classList.add("show");
-      dropZone.style.display = "none";
-      showError("formError", "");
-      detectPages(f);
+    if (fileInput.files && fileInput.files.length) {
+      addFiles(Array.from(fileInput.files));
+      fileInput.value = "";
     }
-  });
-  document.getElementById("fileRemove").addEventListener("click", (e) => {
-    e.stopPropagation();
-    state.file = null;
-    fileInput.value = "";
-    fileChip.classList.remove("show");
-    dropZone.style.display = "block";
-    hideDetect();
-    setPages(1);
   });
 
   // ---- price calc ----
   function calcPrice() {
     const rate = RATES[state.size][state.color];
-    const base = rate * state.pages * state.copies;
+    const pages = totalPages();
+    const base = rate * pages * state.copies;
     const cover = state.cover === "yes" ? COVER_RATE[state.size] * state.copies : 0;
-    return { base, cover, total: base + cover };
+    return { base, cover, total: base + cover, pages };
   }
   function renderPrice() {
-    const { base, cover, total } = calcPrice();
+    const { base, cover, total, pages } = calcPrice();
     const sizeLabel = state.size;
     const colorLabel = state.color === "bw" ? "黑白" : "彩色";
     document.getElementById("priceBreak1").textContent =
-      `${sizeLabel} ${colorLabel} × ${state.pages}页 × ${state.copies}份`;
+      `${sizeLabel} ${colorLabel} × ${pages}页 × ${state.copies}份`;
     document.getElementById("priceBreak1v").textContent = `RM ${base.toFixed(2)}`;
     const row2 = document.getElementById("priceBreak2Row");
     if (cover > 0) {
@@ -619,7 +672,8 @@
 
   // ---- step 1 -> step 2 ----
   document.getElementById("toPaymentBtn").addEventListener("click", () => {
-    if (!state.file) { showError("formError", "请先上传要打印的文件"); return; }
+    if (state.files.length === 0) { showError("formError", "请先上传要打印的文件"); return; }
+    if (state.files.some(f => f.status === "detecting")) { showError("formError", "文件还在识别中，请稍等一下"); return; }
     showError("formError", "");
     const { total } = calcPrice();
     document.getElementById("payAmount").textContent = `RM ${total.toFixed(2)}`;
@@ -642,27 +696,28 @@
     showError("payError", "");
 
     try {
-      const { total } = calcPrice();
-      const ext = state.file.name.split(".").pop();
-      const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+      const { total, pages } = calcPrice();
 
-      const { error: upErr } = await sb.storage
-        .from("print-uploads")
-        .upload(path, state.file, { upsert: false });
-      if (upErr) throw upErr;
-
-      const { data: urlData } = sb.storage.from("print-uploads").getPublicUrl(path);
-      const fileUrl = urlData.publicUrl;
+      const uploadedFiles = [];
+      for (const entry of state.files) {
+        const ext = entry.file.name.split(".").pop();
+        const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+        const { error: upErr } = await sb.storage
+          .from("print-uploads")
+          .upload(path, entry.file, { upsert: false });
+        if (upErr) throw upErr;
+        const { data: urlData } = sb.storage.from("print-uploads").getPublicUrl(path);
+        uploadedFiles.push({ name: entry.file.name, url: urlData.publicUrl, pages: entry.pages });
+      }
 
       const { data: orderData, error: insErr } = await sb
         .from("print_orders")
         .insert({
           customer_phone: document.getElementById("phoneInput").value || null,
-          file_url: fileUrl,
-          file_name: state.file.name,
+          files: uploadedFiles,
+          total_pages: pages,
           paper_size: state.size,
           color_mode: state.color,
-          pages: state.pages,
           copies: state.copies,
           double_sided: state.double === "yes",
           plastic_cover: state.cover === "yes",
@@ -691,14 +746,15 @@
 
   function notifyWhatsApp(order, total) {
     if (!CALLMEBOT_APIKEY || CALLMEBOT_APIKEY.startsWith("PASTE_")) return;
+    const fileLines = order.files.map(f => `· ${f.name} (${f.pages}页)`).join("\n");
     const msg =
       `🖨️ 新打印订单 #${order.id.slice(0,8).toUpperCase()}\n` +
-      `${order.paper_size} ${order.color_mode === "bw" ? "黑白" : "彩色"} · ${order.pages}页 × ${order.copies}份\n` +
+      `${order.paper_size} ${order.color_mode === "bw" ? "黑白" : "彩色"} · 共${order.total_pages}页 × ${order.copies}份\n` +
       (order.plastic_cover ? "过胶 ✓\n" : "") +
       (order.double_sided ? "双面\n" : "单面\n") +
       `金额 RM ${total.toFixed(2)}\n` +
       `电话: ${order.customer_phone || "未留"}\n` +
-      `文件: ${order.file_url}`;
+      `文件(${order.files.length}个):\n${fileLines}`;
     const url = `https://api.callmebot.com/whatsapp.php?phone=${CALLMEBOT_PHONE}&apikey=${CALLMEBOT_APIKEY}&text=${encodeURIComponent(msg)}`;
     new Image().src = url;
   }
