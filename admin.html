@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打印订单管理 Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F1E6; --paper-deep:#EDE7D6; --line:#C9BFA8;
+    --ink:#221F1A; --ink-soft:#6B6354;
+    --stamp:#C1432A; --carbon:#D8A230;
+    --paid:#4B7A51; --paid-bg:#E7EFE4;
+    --printed:#3D6FA6; --printed-bg:#E4EDF5;
+    --collected:#6B6354; --collected-bg:#E8E4D8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper-deep); color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    padding:16px;
+  }
+  header{
+    max-width:900px; margin:0 auto 16px;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  header h1{ font-family:'IBM Plex Mono', monospace; font-size:18px; margin:0; }
+  header .count{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); }
+
+  .filters{
+    max-width:900px; margin:0 auto 14px;
+    display:flex; gap:6px; flex-wrap:wrap;
+  }
+  .filters button{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    padding:6px 12px; border:1.3px solid var(--ink); background:transparent;
+    color:var(--ink); cursor:pointer;
+  }
+  .filters button.active{ background:var(--ink); color:var(--paper); }
+
+  .list{ max-width:900px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+
+  .card{
+    background:var(--paper); border:1.3px solid var(--ink);
+    padding:14px 16px;
+  }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:10px; margin-bottom:8px;
+  }
+  .oid{ font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:700; }
+  .time{ font-size:11.5px; color:var(--ink-soft); }
+  .price{ font-family:'IBM Plex Mono', monospace; font-size:18px; font-weight:700; color:var(--stamp); }
+
+  .spec{ font-size:13px; margin-bottom:8px; line-height:1.6; }
+  .spec b{ font-weight:600; }
+  .phone{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
+
+  .row-actions{
+    display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
+    align-items:center;
+  }
+  .file-link{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    color:var(--printed); text-decoration:underline;
+  }
+  select.status{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    padding:6px 8px; border:1.3px solid var(--ink); background:var(--paper);
+  }
+  .badge{
+    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    padding:3px 8px; border-radius:2px; font-weight:600;
+  }
+  .badge.new{ background:#F3E3D0; color:var(--stamp); }
+  .badge.paid_confirmed{ background:var(--paid-bg); color:var(--paid); }
+  .badge.printed{ background:var(--printed-bg); color:var(--printed); }
+  .badge.collected{ background:var(--collected-bg); color:var(--collected); }
+
+  .empty{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:13px; }
+
+  .gate{
+    max-width:320px; margin:120px auto; text-align:center;
+  }
+  .gate h2{ font-family:'IBM Plex Mono', monospace; }
+  .gate input{
+    width:100%; padding:10px; font-size:16px; text-align:center;
+    border:1.3px solid var(--ink); background:var(--paper); margin-bottom:10px;
+    letter-spacing:0.2em;
+  }
+  .gate button{
+    width:100%; padding:12px; font-family:'IBM Plex Mono', monospace;
+    background:var(--ink); color:var(--paper); border:none; cursor:pointer;
+  }
+  .gate .err{ color:var(--stamp); font-size:12px; margin-top:8px; }
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <h2>🔒 员工专用</h2>
+  <input type="password" id="pin" placeholder="PIN" inputmode="numeric">
+  <button id="gateBtn">进入</button>
+  <div class="err hidden" id="gateErr">PIN 不对</div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <h1>🖨️ 打印订单 ORDERS</h1>
+    <span class="count" id="countLabel"></span>
+  </header>
+  <div class="filters" id="filters">
+    <button data-f="all" class="active">全部</button>
+    <button data-f="new">新单</button>
+    <button data-f="paid_confirmed">已确认付款</button>
+    <button data-f="printed">已打印</button>
+    <button data-f="collected">已取件</button>
+  </div>
+  <div class="list" id="list"></div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+  const SUPABASE_KEY = "sb_publishable_-1Hhh1o7Uv4qQNb1NKCKew_7UuG4qpT";
+  const ADMIN_PIN = "1234"; // 先用这个测试，之后想改就改这行
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const STATUS_LABEL = {
+    new: "新单", paid_confirmed: "已确认付款", printed: "已打印", collected: "已取件"
+  };
+
+  document.getElementById("gateBtn").addEventListener("click", tryEnter);
+  document.getElementById("pin").addEventListener("keydown", e => { if (e.key === "Enter") tryEnter(); });
+  function tryEnter() {
+    const val = document.getElementById("pin").value;
+    if (val === ADMIN_PIN) {
+      sessionStorage.setItem("po_admin_ok", "1");
+      document.getElementById("gate").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+      loadOrders();
+    } else {
+      document.getElementById("gateErr").classList.remove("hidden");
+    }
+  }
+  if (sessionStorage.getItem("po_admin_ok") === "1") {
+    document.getElementById("gate").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    loadOrders();
+  }
+
+  let orders = [];
+  let currentFilter = "all";
+
+  document.querySelectorAll("#filters button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#filters button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.f;
+      render();
+    });
+  });
+
+  async function loadOrders() {
+    const { data, error } = await sb
+      .from("print_orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) { alert("加载失败: " + error.message); return; }
+    orders = data;
+    render();
+  }
+
+  function render() {
+    const list = document.getElementById("list");
+    const filtered = currentFilter === "all" ? orders : orders.filter(o => o.status === currentFilter);
+    document.getElementById("countLabel").textContent = `共 ${filtered.length} 单`;
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty">暂时没有订单</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(o => {
+      const t = new Date(o.created_at).toLocaleString("zh-CN", { dateStyle: "short", timeStyle: "short" });
+      return `
+        <div class="card">
+          <div class="card-top">
+            <div>
+              <span class="oid">#${o.id.slice(0,8).toUpperCase()}</span>
+              <span class="badge ${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
+              <div class="time">${t}</div>
+            </div>
+            <div class="price">RM ${Number(o.price).toFixed(2)}</div>
+          </div>
+          <div class="spec">
+            <b>${o.paper_size}</b> · ${o.color_mode === "bw" ? "黑白" : "彩色"} ·
+            ${o.pages}页 × ${o.copies}份 ·
+            ${o.double_sided ? "双面" : "单面"}
+            ${o.plastic_cover ? " · 过胶" : ""}
+          </div>
+          <div class="phone">📞 ${o.customer_phone || "未留电话"}</div>
+          <div class="row-actions">
+            <a class="file-link" href="${o.file_url}" target="_blank" rel="noopener">📄 打开文件</a>
+            <select class="status" data-id="${o.id}">
+              <option value="new" ${o.status === "new" ? "selected" : ""}>新单</option>
+              <option value="paid_confirmed" ${o.status === "paid_confirmed" ? "selected" : ""}>已确认付款</option>
+              <option value="printed" ${o.status === "printed" ? "selected" : ""}>已打印</option>
+              <option value="collected" ${o.status === "collected" ? "selected" : ""}>已取件</option>
+            </select>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    list.querySelectorAll("select.status").forEach(sel => {
+      sel.addEventListener("change", async () => {
+        const id = sel.dataset.id;
+        const { error } = await sb.from("print_orders").update({ status: sel.value }).eq("id", id);
+        if (error) { alert("更新失败: " + error.message); return; }
+        const o = orders.find(x => x.id === id);
+        if (o) o.status = sel.value;
+        render();
+      });
+    });
+  }
+
+  // 每 20 秒自动刷新一次，看有没有新单
+  setInterval(() => {
+    if (!document.getElementById("app").classList.contains("hidden")) loadOrders();
+  }, 20000);
+</script>
+
+</body>
+</html>
