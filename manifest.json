@@ -1,6 +1,6 @@
 {
-  "name": "CFT 打印下单",
-  "short_name": "CFT打印",
+  "name": "Kedai 19 Print Order",
+  "short_name": "Kedai 19",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
