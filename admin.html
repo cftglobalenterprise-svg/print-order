@@ -160,58 +160,55 @@
       display:block; position:absolute; top:0; left:0; width:100%;
       font-family:'Inter', sans-serif; color:#221F1A;
     }
-    #receiptArea .r-topbar{
-      height:6px; background:#C1432A; margin-bottom:22px;
+    #receiptArea .r-center{ text-align:center; }
+    #receiptArea .r-brand{ font-size:34px; font-weight:800; letter-spacing:0.01em; margin:0; }
+    #receiptArea .r-bizline{ font-size:12px; color:#4A453B; margin-top:6px; }
+    #receiptArea .r-line{ border-top:1.5px dashed #C9BFA8; margin:18px 0; }
+    #receiptArea .r-line.solid{ border-top:2.5px solid #221F1A; }
+    #receiptArea .r-doctype{
+      font-size:11px; font-weight:700; letter-spacing:0.18em; color:#6B6354; margin-bottom:4px;
     }
-    #receiptArea .r-head{
-      display:flex; justify-content:space-between; align-items:flex-start;
-      margin-bottom:6px;
+    #receiptArea .r-invno{ font-size:22px; font-weight:800; }
+    #receiptArea .r-infogrid{ display:flex; gap:14px; margin:16px 0; }
+    #receiptArea .r-infobox{
+      flex:1; background:#F2EEE2; padding:12px 14px;
     }
-    #receiptArea .r-brand h2{
-      font-family:'Inter', sans-serif; font-size:26px; margin:0; letter-spacing:0.02em;
+    #receiptArea .r-infobox .r-infolabel{
+      font-size:10px; font-weight:700; letter-spacing:0.1em; color:#6B6354; margin-bottom:3px;
     }
-    #receiptArea .r-brand .r-tagline{
-      font-family:'Inter', sans-serif; font-size:11px; letter-spacing:0.12em;
-      color:#6B6354; margin-top:2px;
+    #receiptArea .r-infobox .r-infoval{ font-size:14px; font-weight:700; }
+    #receiptArea table.r-items{ width:100%; border-collapse:collapse; margin-top:6px; }
+    #receiptArea table.r-items th{
+      text-align:left; font-size:10.5px; letter-spacing:0.08em; color:#6B6354;
+      border-bottom:2.5px solid #221F1A; padding:0 0 8px;
     }
-    #receiptArea .r-oid{
-      text-align:right; font-family:'Inter', sans-serif;
+    #receiptArea table.r-items th.num, #receiptArea table.r-items td.num{ text-align:right; }
+    #receiptArea table.r-items td{
+      font-size:14px; padding:10px 0; border-bottom:1px solid #C9BFA8;
     }
-    #receiptArea .r-oid .r-oid-num{ font-size:20px; font-weight:700; color:#C1432A; }
-    #receiptArea .r-oid .r-oid-date{ font-size:11px; color:#6B6354; margin-top:2px; }
-    #receiptArea .r-line{ border-top:1.5px dashed #C9BFA8; margin:16px 0; }
-    #receiptArea .r-section-title{
-      font-family:'Inter', sans-serif; font-size:10.5px; letter-spacing:0.1em;
-      color:#6B6354; margin-bottom:8px;
+    #receiptArea table.r-items td.subtotal{ font-weight:700; }
+    #receiptArea .r-total-row{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:14px;
     }
-    #receiptArea .r-row{
-      display:flex; justify-content:space-between;
-      font-size:13.5px; padding:4px 0;
+    #receiptArea .r-total-label{ font-size:22px; font-weight:800; }
+    #receiptArea .r-total-val{ font-size:28px; font-weight:800; color:#C1432A; }
+    #receiptArea .r-pay-badge{
+      display:inline-block; margin-top:10px;
+      background:#221F1A; color:#F5F1E6;
+      font-size:11.5px; font-weight:700; letter-spacing:0.06em;
+      padding:6px 14px;
     }
-    #receiptArea .r-row .r-label{ color:#6B6354; }
-    #receiptArea .r-file-row{ font-family:'Inter', sans-serif; font-size:12.5px; }
-    #receiptArea .r-total-block{
-      background:#EDE7D6; padding:12px 16px; margin-top:6px;
+    #receiptArea .r-qr-box{
+      display:flex; align-items:center; gap:20px;
+      border:2px dashed #221F1A; padding:18px 20px; margin-top:24px;
     }
-    #receiptArea .r-row.r-total{
-      font-family:'Inter', sans-serif; font-size:19px; font-weight:700;
-      border-top:1.5px solid #221F1A; margin-top:6px; padding-top:10px;
-    }
-    #receiptArea .r-row.r-total .r-total-val{ color:#C1432A; }
-    #receiptArea .r-pay-status{
-      display:inline-block; margin-top:4px;
-      font-family:'Inter', sans-serif; font-size:11.5px; font-weight:700;
-      border:1.3px solid #221F1A; padding:4px 10px;
-    }
-    #receiptArea .r-foot{
-      text-align:center; margin-top:40px;
-      font-family:'Inter', sans-serif; font-size:13px; letter-spacing:0.06em;
-      color:#6B6354;
-    }
-    #receiptArea .r-foot .r-stamp-word{
-      display:inline-block; border:2px solid #4B7A51; color:#4B7A51;
-      transform:rotate(-3deg); padding:6px 14px; font-weight:700; margin-bottom:10px;
-    }
+    #receiptArea .r-qr-box img{ width:130px; height:130px; flex-shrink:0; }
+    #receiptArea .r-qr-box .r-qr-title{ font-size:15px; font-weight:800; margin-bottom:4px; }
+    #receiptArea .r-qr-box .r-qr-text{ font-size:12px; color:#4A453B; line-height:1.5; }
+    #receiptArea .r-foot{ text-align:center; margin-top:26px; }
+    #receiptArea .r-foot .r-thanks{ font-size:14px; font-weight:800; letter-spacing:0.08em; }
+    #receiptArea .r-foot .r-note{ font-size:11px; color:#6B6354; margin-top:6px; }
   }
 </style>
 </head>
@@ -350,57 +347,111 @@
     return `<span class="badge pay-store">🏪 到店付款(未收)</span>`;
   }
 
+  // 店铺信息 —— 地址/营业时间是照你截图里的抄的，不对的话跟我说，改这里就行
+  const BIZ = {
+    name: "KEDAI 19",
+    address: "No 19, Bandar Baru Brinchang, 39100 Brinchang, Pahang",
+    phone: "+6011-3335 1400",
+    hours: "9:00 AM - 9:30 PM Daily",
+    ssm: "202203221872 (NS0273693-A)",
+    orderUrl: "https://cftglobalenterprise-svg.github.io/print-order/"
+  };
+
   function buildReceiptHtml(o) {
-    const t = new Date(o.created_at).toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" });
+    const created = new Date(o.created_at);
+    const dateStr = created.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    const timeStr = created.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
     const shortId = o.id.slice(0,8).toUpperCase();
+    const invNo = "INV-" + created.toISOString().slice(2,10).replace(/-/g,"") + "-" + shortId.slice(0,6);
+
     const rate = { A5:{bw:0.50,color:1.00}, A4:{bw:0.50,color:1.00}, A3:{bw:1.00,color:2.00} };
     const coverRate = { A5:3.00, A3:5.00, A4:3.00 };
-    const base = (rate[o.paper_size]?.[o.color_mode] || 0) * o.total_pages * o.copies;
+    const qty = o.total_pages * o.copies;
+    const unitPrice = rate[o.paper_size]?.[o.color_mode] || 0;
+    const base = unitPrice * qty;
     const cover = o.plastic_cover ? (coverRate[o.paper_size] || 0) * o.copies : 0;
-    const fileLines = (o.files || []).map(f =>
-      `<div class="r-row r-file-row"><span>· ${f.name}</span><span>${f.pages} 页</span></div>`
-    ).join("");
-    const payText = o.paid ? "✓ 已收款 PAID" : (o.payment_method === "online_claimed" ? "💳 线上已付（待核实）" : "🏪 到店付款（未收）");
+
+    const colorLabel = o.color_mode === "bw" ? "B&W" : "COLOR";
+    const itemRows = `
+      <tr>
+        <td>${o.paper_size} PRINTING ${colorLabel} · ${o.double_sided ? "Double-sided" : "Single-sided"}</td>
+        <td class="num">${qty}</td>
+        <td class="num">RM ${unitPrice.toFixed(2)}</td>
+        <td class="num subtotal">RM ${base.toFixed(2)}</td>
+      </tr>
+      ${cover > 0 ? `
+      <tr>
+        <td>LAMINATION (${o.paper_size})</td>
+        <td class="num">${o.copies}</td>
+        <td class="num">RM ${(coverRate[o.paper_size] || 0).toFixed(2)}</td>
+        <td class="num subtotal">RM ${cover.toFixed(2)}</td>
+      </tr>` : ""}
+    `;
+
+    const payText = o.paid ? "PAID" : (o.payment_method === "online_claimed" ? "PAID VIA QR (PENDING VERIFICATION)" : "PAY AT STORE (UNPAID)");
+
     return `
-      <div class="r-topbar"></div>
-      <div class="r-head">
-        <div class="r-brand">
-          <h2>KEDAI 19</h2>
-          <div class="r-tagline">PRINT SERVICE RECEIPT · 打印服务收据</div>
-        </div>
-        <div class="r-oid">
-          <div class="r-oid-num">#${shortId}</div>
-          <div class="r-oid-date">${t}</div>
-        </div>
+      <div class="r-center">
+        <div class="r-brand">${BIZ.name}</div>
+        <div class="r-bizline">${BIZ.address}</div>
+        <div class="r-bizline">Tel: ${BIZ.phone} &nbsp;|&nbsp; Hours: ${BIZ.hours}</div>
+        <div class="r-bizline">SSM No: ${BIZ.ssm}</div>
       </div>
 
       <div class="r-line"></div>
 
-      <div class="r-row"><span class="r-label">联系电话 Phone</span><span>${o.customer_phone || "-"}</span></div>
-
-      <div class="r-line"></div>
-
-      <div class="r-section-title">文件明细 FILES</div>
-      ${fileLines}
-
-      <div class="r-line"></div>
-
-      <div class="r-section-title">打印规格 SPEC</div>
-      <div class="r-row"><span class="r-label">纸张 / 颜色</span><span>${o.paper_size} · ${o.color_mode === "bw" ? "黑白" : "彩色"}</span></div>
-      <div class="r-row"><span class="r-label">份数</span><span>${o.copies} 份</span></div>
-      <div class="r-row"><span class="r-label">单/双面</span><span>${o.double_sided ? "双面" : "单面"}</span></div>
-      <div class="r-row"><span class="r-label">过胶</span><span>${o.plastic_cover ? "是" : "否"}</span></div>
-
-      <div class="r-total-block">
-        <div class="r-row"><span class="r-label">印刷费</span><span>RM ${base.toFixed(2)}</span></div>
-        ${cover > 0 ? `<div class="r-row"><span class="r-label">过胶费</span><span>RM ${cover.toFixed(2)}</span></div>` : ""}
-        <div class="r-row r-total"><span>总额 TOTAL</span><span class="r-total-val">RM ${Number(o.price).toFixed(2)}</span></div>
+      <div class="r-center">
+        <div class="r-doctype">OFFICIAL RECEIPT</div>
+        <div class="r-invno">${invNo}</div>
       </div>
-      <div class="r-pay-status">${payText}</div>
+
+      <div class="r-line solid"></div>
+
+      <div class="r-infogrid">
+        <div class="r-infobox">
+          <div class="r-infolabel">DATE &amp; TIME</div>
+          <div class="r-infoval">${dateStr} at ${timeStr}</div>
+        </div>
+        <div class="r-infobox">
+          <div class="r-infolabel">CUSTOMER</div>
+          <div class="r-infoval">${o.customer_phone || "Walk-in Customer"}</div>
+        </div>
+      </div>
+
+      <table class="r-items">
+        <thead>
+          <tr>
+            <th>ITEM</th>
+            <th class="num">QTY</th>
+            <th class="num">UNIT PRICE</th>
+            <th class="num">SUBTOTAL</th>
+          </tr>
+        </thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+
+      <div class="r-line"></div>
+
+      <div class="r-total-row">
+        <div class="r-total-label">TOTAL AMOUNT</div>
+        <div class="r-total-val">RM ${Number(o.price).toFixed(2)}</div>
+      </div>
+      <div class="r-pay-badge">${payText}</div>
+
+      <div class="r-qr-box">
+        <img src="assets/order-qr.png" alt="Order QR">
+        <div>
+          <div class="r-qr-title">PRINTING &amp; PHOTOSTAT SERVICES</div>
+          <div class="r-qr-text">Need printing, photostat or scanning next time?<br>Scan this QR to order online.<br><b>${BIZ.orderUrl.replace("https://","")}</b></div>
+        </div>
+      </div>
+
+      <div class="r-line"></div>
 
       <div class="r-foot">
-        <div class="r-stamp-word">谢谢惠顾</div>
-        <div>THANK YOU FOR YOUR ORDER</div>
+        <div class="r-thanks">THANK YOU!</div>
+        <div class="r-note">This is a computer-generated receipt. No signature required.</div>
+        <div class="r-note">SSM No: ${BIZ.ssm}</div>
       </div>
     `;
   }
