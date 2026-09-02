@@ -158,57 +158,57 @@
     #receiptArea, #receiptArea *{ visibility:visible; }
     #receiptArea{
       display:block; position:absolute; top:0; left:0; width:100%;
-      font-family:'Inter', sans-serif; color:#221F1A;
+      font-family:'Inter', sans-serif; color:#000000;
     }
     #receiptArea .r-center{ text-align:center; }
-    #receiptArea .r-brand{ font-size:34px; font-weight:800; letter-spacing:0.01em; margin:0; }
-    #receiptArea .r-bizline{ font-size:12px; color:#221F1A; margin-top:6px; }
-    #receiptArea .r-line{ border-top:1.5px dashed #C9BFA8; margin:18px 0; }
-    #receiptArea .r-line.solid{ border-top:2.5px solid #221F1A; }
+    #receiptArea .r-brand{ font-size:34px; font-weight:800; letter-spacing:0.01em; margin:0; color:#000000; }
+    #receiptArea .r-bizline{ font-size:12px; color:#000000; margin-top:6px; }
+    #receiptArea .r-line{ border-top:1.5px dashed #000000; margin:18px 0; }
+    #receiptArea .r-line.solid{ border-top:2.5px solid #000000; }
     #receiptArea .r-doctype{
-      font-size:11px; font-weight:700; letter-spacing:0.18em; color:#221F1A; margin-bottom:4px;
+      font-size:11px; font-weight:700; letter-spacing:0.18em; color:#000000; margin-bottom:4px;
     }
-    #receiptArea .r-invno{ font-size:22px; font-weight:800; }
+    #receiptArea .r-invno{ font-size:22px; font-weight:800; color:#000000; }
     #receiptArea .r-infogrid{ display:flex; gap:14px; margin:16px 0; }
     #receiptArea .r-infobox{
       flex:1; background:#F2EEE2; padding:12px 14px;
     }
     #receiptArea .r-infobox .r-infolabel{
-      font-size:10px; font-weight:700; letter-spacing:0.1em; color:#221F1A; margin-bottom:3px;
+      font-size:10px; font-weight:700; letter-spacing:0.1em; color:#000000; margin-bottom:3px;
     }
-    #receiptArea .r-infobox .r-infoval{ font-size:14px; font-weight:700; }
+    #receiptArea .r-infobox .r-infoval{ font-size:14px; font-weight:700; color:#000000; }
     #receiptArea table.r-items{ width:100%; border-collapse:collapse; margin-top:6px; }
     #receiptArea table.r-items th{
-      text-align:left; font-size:10.5px; letter-spacing:0.08em; color:#221F1A;
-      border-bottom:2.5px solid #221F1A; padding:0 0 8px;
+      text-align:left; font-size:10.5px; letter-spacing:0.08em; color:#000000;
+      border-bottom:2.5px solid #000000; padding:0 0 8px;
     }
     #receiptArea table.r-items th.num, #receiptArea table.r-items td.num{ text-align:right; }
     #receiptArea table.r-items td{
-      font-size:14px; padding:10px 0; border-bottom:1px solid #C9BFA8;
+      font-size:14px; padding:10px 0; border-bottom:1px solid #000000; color:#000000;
     }
     #receiptArea table.r-items td.subtotal{ font-weight:700; }
     #receiptArea .r-total-row{
       display:flex; justify-content:space-between; align-items:center;
       margin-top:14px;
     }
-    #receiptArea .r-total-label{ font-size:22px; font-weight:800; }
+    #receiptArea .r-total-label{ font-size:22px; font-weight:800; color:#000000; }
     #receiptArea .r-total-val{ font-size:28px; font-weight:800; color:#C1432A; }
     #receiptArea .r-pay-badge{
       display:inline-block; margin-top:10px;
-      background:#221F1A; color:#F5F1E6;
+      background:#000000; color:#F5F1E6;
       font-size:11.5px; font-weight:700; letter-spacing:0.06em;
       padding:6px 14px;
     }
     #receiptArea .r-qr-box{
       display:flex; align-items:center; gap:20px;
-      border:2px dashed #221F1A; padding:18px 20px; margin-top:24px;
+      border:2px dashed #000000; padding:18px 20px; margin-top:24px;
     }
     #receiptArea .r-qr-box img{ width:130px; height:130px; flex-shrink:0; }
-    #receiptArea .r-qr-box .r-qr-title{ font-size:15px; font-weight:800; margin-bottom:4px; }
-    #receiptArea .r-qr-box .r-qr-text{ font-size:12px; color:#221F1A; line-height:1.5; }
+    #receiptArea .r-qr-box .r-qr-title{ font-size:15px; font-weight:800; color:#000000; margin-bottom:4px; }
+    #receiptArea .r-qr-box .r-qr-text{ font-size:12px; color:#000000; line-height:1.5; }
     #receiptArea .r-foot{ text-align:center; margin-top:26px; }
-    #receiptArea .r-foot .r-thanks{ font-size:14px; font-weight:800; letter-spacing:0.08em; }
-    #receiptArea .r-foot .r-note{ font-size:11px; color:#221F1A; margin-top:6px; }
+    #receiptArea .r-foot .r-thanks{ font-size:14px; font-weight:800; letter-spacing:0.08em; color:#000000; }
+    #receiptArea .r-foot .r-note{ font-size:11px; color:#000000; margin-top:6px; }
   }
 </style>
 </head>
@@ -356,6 +356,8 @@
     ssm: "202203221872 (NS0273693-A)",
     orderUrl: "https://cftglobalenterprise-svg.github.io/print-order/"
   };
+  // 提前把QR图片load进浏览器缓存，避免第一次开收据时QR还没加载完就打印
+  new Image().src = "assets/order-qr.png";
 
   function buildReceiptHtml(o) {
     const created = new Date(o.created_at);
@@ -557,7 +559,13 @@
       const o = orders.find(x => x.id === receiptBtn.dataset.id);
       if (!o) return;
       document.getElementById("receiptArea").innerHTML = buildReceiptHtml(o);
-      window.print();
+      const qrImg = document.querySelector("#receiptArea .r-qr-box img");
+      if (qrImg && !qrImg.complete) {
+        qrImg.addEventListener("load", () => window.print(), { once: true });
+        qrImg.addEventListener("error", () => window.print(), { once: true });
+      } else {
+        window.print();
+      }
       return;
     }
 
