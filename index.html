@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>CFT 打印订单 Print Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F1E6;
+    --paper-deep:#EDE7D6;
+    --line:#C9BFA8;
+    --ink:#221F1A;
+    --ink-soft:#6B6354;
+    --stamp:#C1432A;
+    --stamp-dark:#9E3220;
+    --carbon:#D8A230;
+    --paid:#4B7A51;
+    --paid-bg:#E7EFE4;
+    --error:#B23A2E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper-deep);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(34,31,26,0.06) 1px, transparent 0);
+    background-size:14px 14px;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:28px 14px 60px;
+  }
+  .ticket{
+    width:100%;
+    max-width:420px;
+    background:var(--paper);
+    border:1.5px solid var(--ink);
+    box-shadow:6px 6px 0 rgba(34,31,26,0.12);
+    position:relative;
+  }
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute;
+    width:22px; height:22px;
+    background:var(--paper-deep);
+    border-radius:50%;
+    top:106px;
+  }
+  .ticket::before{ left:-12px; box-shadow: 0 0 0 1.5px var(--ink) inset;}
+  .ticket::after{ right:-12px; box-shadow: 0 0 0 1.5px var(--ink) inset;}
+
+  .head{
+    padding:22px 22px 16px;
+    text-align:left;
+  }
+  .head .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    margin:0 0 4px;
+  }
+  .head h1{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 2px;
+    line-height:1.25;
+  }
+  .head p{
+    margin:6px 0 0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  .perf{
+    border-top:1.5px dashed var(--line);
+    margin:0;
+  }
+
+  .section{
+    padding:18px 22px;
+  }
+  .section h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    margin:0 0 12px;
+    color:var(--ink);
+  }
+  .section h2 .no{ color:var(--stamp); margin-right:6px; }
+
+  /* upload */
+  .drop{
+    border:1.5px dashed var(--line);
+    background:rgba(255,255,255,0.35);
+    padding:22px 14px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s;
+  }
+  .drop:active, .drop.drag{ border-color:var(--stamp); }
+  .drop .icon{ font-size:26px; display:block; margin-bottom:6px; }
+  .drop .main{ font-size:14px; font-weight:600; }
+  .drop .sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+  #fileInput{ display:none; }
+  .file-chip{
+    margin-top:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    padding:8px 10px;
+    display:none;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+  .file-chip.show{ display:flex; }
+  .file-chip button{
+    background:none; border:none; color:var(--stamp);
+    font-family:'IBM Plex Mono', monospace; font-size:12px; cursor:pointer;
+    padding:2px 4px;
+  }
+  .hint-save{
+    margin-top:8px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+
+  /* option rows */
+  .opt-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid rgba(201,191,168,0.6);
+  }
+  .opt-row:last-child{ border-bottom:none; }
+  .opt-label{ font-size:14px; font-weight:500; }
+  .chips{ display:flex; gap:6px; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:7px 12px;
+    border:1.3px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .chip.active{
+    background:var(--ink);
+    color:var(--paper);
+  }
+  .stepper{ display:flex; align-items:center; gap:0; border:1.3px solid var(--ink); }
+  .stepper button{
+    width:30px; height:30px;
+    background:transparent; border:none;
+    font-size:16px; font-weight:600;
+    cursor:pointer; color:var(--ink);
+  }
+  .stepper button:active{ background:var(--paper-deep); }
+  .stepper input{
+    width:34px; text-align:center; border:none;
+    border-left:1.3px solid var(--ink); border-right:1.3px solid var(--ink);
+    font-family:'IBM Plex Mono', monospace; font-size:13px;
+    background:transparent; color:var(--ink);
+    height:30px;
+  }
+
+  input[type=tel]{
+    width:100%;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    padding:10px 10px;
+    border:1.3px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+  }
+
+  /* total */
+  .total-block{
+    padding:18px 22px;
+    background:var(--paper-deep);
+  }
+  .total-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px; color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .total-row.main{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1.5px solid var(--ink);
+    color:var(--ink);
+    font-size:14px;
+    font-weight:600;
+  }
+  .total-row.main .val{
+    font-size:24px;
+    font-weight:700;
+    color:var(--stamp);
+  }
+
+  /* actions */
+  .actions{ padding:18px 22px 24px; }
+  .btn{
+    width:100%;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    padding:14px;
+    border:1.5px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btn.secondary{
+    background:transparent; color:var(--ink);
+    margin-top:10px;
+  }
+  .btn.stamp{ background:var(--stamp); border-color:var(--stamp); }
+  .btn.stamp:active{ background:var(--stamp-dark); }
+
+  .error-msg{
+    font-size:12.5px; color:var(--error);
+    margin-top:8px; display:none;
+  }
+  .error-msg.show{ display:block; }
+
+  /* payment view */
+  .qr-wrap{
+    text-align:center;
+    padding:6px 0 4px;
+  }
+  .qr-wrap img{
+    width:200px; height:200px;
+    object-fit:contain;
+    border:1.5px solid var(--ink);
+    background:#fff;
+  }
+  .qr-amount{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:28px; font-weight:700;
+    color:var(--stamp);
+    text-align:center;
+    margin:14px 0 2px;
+  }
+  .qr-note{
+    text-align:center; font-size:12px; color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+
+  /* done view */
+  .done-block{ padding:36px 22px; text-align:center; }
+  .done-block .stampmark{
+    display:inline-block;
+    border:2.5px solid var(--paid);
+    color:var(--paid);
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:0.08em;
+    padding:8px 16px;
+    transform:rotate(-4deg);
+    margin-bottom:16px;
+  }
+  .done-block h3{ margin:0 0 8px; font-size:17px; }
+  .done-block p{ font-size:13px; color:var(--ink-soft); margin:4px 0; }
+  .done-block .oid{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; margin-top:14px;
+    background:var(--paper-deep); border:1px solid var(--line);
+    padding:8px; display:inline-block;
+  }
+
+  .hidden{ display:none !important; }
+  .spinner{
+    width:14px;height:14px;border:2px solid var(--paper);
+    border-top-color:transparent; border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+</style>
+</head>
+<body>
+
+<div class="ticket">
+
+  <div class="head">
+    <p class="tag">CFT GLOBAL ENTERPRISE · PRINT SERVICE</p>
+    <h1>打印下单 PRINT ORDER</h1>
+    <p>上传文件 → 选规格 → 扫码付款，剩下交给我们</p>
+  </div>
+
+  <div class="perf"></div>
+
+  <!-- ============ STEP 1: FORM ============ -->
+  <div id="formView">
+
+    <div class="section">
+      <h2><span class="no">01</span>上传文件 UPLOAD</h2>
+      <div class="drop" id="dropZone">
+        <span class="icon">📎</span>
+        <div class="main">点击选择文件</div>
+        <div class="sub">支持 PDF / JPG / PNG / DOC / DOCX，最大 50MB</div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+      <div class="file-chip" id="fileChip">
+        <span id="fileName"></span>
+        <button type="button" id="fileRemove">移除 ✕</button>
+      </div>
+      <p class="hint-save">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。</p>
+    </div>
+
+    <div class="perf"></div>
+
+    <div class="section">
+      <h2><span class="no">02</span>打印规格 SPEC</h2>
+
+      <div class="opt-row">
+        <span class="opt-label">纸张 Size</span>
+        <div class="chips" data-group="size">
+          <button class="chip active" data-value="A4">A4</button>
+          <button class="chip" data-value="A3">A3</button>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <span class="opt-label">颜色 Color</span>
+        <div class="chips" data-group="color">
+          <button class="chip active" data-value="bw">黑白</button>
+          <button class="chip" data-value="color">彩色</button>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <span class="opt-label">文件页数 Pages</span>
+        <div class="stepper" data-group="pages">
+          <button type="button" data-dir="-1">−</button>
+          <input type="text" value="1" inputmode="numeric" readonly>
+          <button type="button" data-dir="1">+</button>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <span class="opt-label">份数 Copies</span>
+        <div class="stepper" data-group="copies">
+          <button type="button" data-dir="-1">−</button>
+          <input type="text" value="1" inputmode="numeric" readonly>
+          <button type="button" data-dir="1">+</button>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <span class="opt-label">双面打印 Double-sided</span>
+        <div class="chips" data-group="double">
+          <button class="chip" data-value="no">否</button>
+          <button class="chip active" data-value="yes">是</button>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <span class="opt-label">过胶 Laminate</span>
+        <div class="chips" data-group="cover">
+          <button class="chip active" data-value="no">否</button>
+          <button class="chip" data-value="yes">是</button>
+        </div>
+      </div>
+
+      <div class="opt-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:6px;">
+        <span class="opt-label">联系电话 Phone（方便通知你取件）</span>
+        <input type="tel" id="phoneInput" placeholder="012-3456789">
+      </div>
+    </div>
+
+    <div class="perf"></div>
+
+    <div class="total-block">
+      <div class="total-row"><span id="priceBreak1">A4 黑白 × 1页 × 1份</span><span id="priceBreak1v">RM 0.50</span></div>
+      <div class="total-row hidden" id="priceBreak2Row"><span>过胶</span><span id="priceBreak2v">RM 0.00</span></div>
+      <div class="total-row main"><span>总额 TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn stamp" id="toPaymentBtn">下一步：付款 →</button>
+      <p class="error-msg" id="formError"></p>
+    </div>
+  </div>
+
+  <!-- ============ STEP 2: PAYMENT ============ -->
+  <div id="payView" class="hidden">
+    <div class="section">
+      <h2><span class="no">03</span>扫码付款 PAY</h2>
+      <div class="qr-wrap">
+        <img src="assets/duitnow-qr.jpg" alt="DuitNow QR">
+      </div>
+      <div class="qr-amount" id="payAmount">RM 0.50</div>
+      <div class="qr-note">DuitNow QR · 任何银行 App / e-wallet 都可扫</div>
+    </div>
+    <div class="perf"></div>
+    <div class="actions">
+      <button class="btn stamp" id="paidBtn">
+        <span id="paidBtnText">✓ 我已经付款，提交订单</span>
+      </button>
+      <button class="btn secondary" id="backBtn">← 返回修改</button>
+      <p class="error-msg" id="payError"></p>
+    </div>
+  </div>
+
+  <!-- ============ STEP 3: DONE ============ -->
+  <div id="doneView" class="hidden">
+    <div class="done-block">
+      <div class="stampmark">已提交 SUBMITTED</div>
+      <h3>订单已收到</h3>
+      <p>我们会核实付款后开始打印</p>
+      <p>好了会用你的号码联系你取件</p>
+      <div class="oid" id="orderIdShow"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  // ====== 需要填的设置 ======
+  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+  const SUPABASE_KEY = "sb_publishable_-1Hhh1o7Uv4qQNb1NKCKew_7UuG4qpT";
+  const CALLMEBOT_PHONE = "601133351400";
+  const CALLMEBOT_APIKEY = "PASTE_YOUR_CALLMEBOT_APIKEY_HERE";
+
+  // 价格表 —— 之后要改价钱就改这里
+  const RATES = {
+    A4: { bw: 0.50, color: 1.00 },
+    A3: { bw: 1.00, color: 2.00 }
+  };
+  const COVER_RATE = { A4: 3.00, A3: 5.00 };
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const state = {
+    size: "A4", color: "bw", pages: 1, copies: 1,
+    double: "yes", cover: "no", file: null
+  };
+
+  // ---- chip groups ----
+  document.querySelectorAll(".chips").forEach(group => {
+    const key = group.dataset.group;
+    group.querySelectorAll(".chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        group.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state[key] = btn.dataset.value;
+        renderPrice();
+      });
+    });
+  });
+
+  // ---- steppers ----
+  document.querySelectorAll(".stepper").forEach(step => {
+    const key = step.dataset.group;
+    const input = step.querySelector("input");
+    step.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const dir = parseInt(btn.dataset.dir, 10);
+        let v = state[key] + dir;
+        if (v < 1) v = 1;
+        if (v > 999) v = 999;
+        state[key] = v;
+        input.value = v;
+        renderPrice();
+      });
+    });
+  });
+
+  // ---- upload ----
+  const dropZone = document.getElementById("dropZone");
+  const fileInput = document.getElementById("fileInput");
+  const fileChip = document.getElementById("fileChip");
+  const fileName = document.getElementById("fileName");
+
+  dropZone.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files && fileInput.files[0]) {
+      const f = fileInput.files[0];
+      if (f.size > 50 * 1024 * 1024) {
+        showError("formError", "文件太大了，最大 50MB");
+        fileInput.value = "";
+        return;
+      }
+      state.file = f;
+      fileName.textContent = f.name;
+      fileChip.classList.add("show");
+      dropZone.style.display = "none";
+      showError("formError", "");
+    }
+  });
+  document.getElementById("fileRemove").addEventListener("click", (e) => {
+    e.stopPropagation();
+    state.file = null;
+    fileInput.value = "";
+    fileChip.classList.remove("show");
+    dropZone.style.display = "block";
+  });
+
+  // ---- price calc ----
+  function calcPrice() {
+    const rate = RATES[state.size][state.color];
+    const base = rate * state.pages * state.copies;
+    const cover = state.cover === "yes" ? COVER_RATE[state.size] * state.copies : 0;
+    return { base, cover, total: base + cover };
+  }
+  function renderPrice() {
+    const { base, cover, total } = calcPrice();
+    const sizeLabel = state.size;
+    const colorLabel = state.color === "bw" ? "黑白" : "彩色";
+    document.getElementById("priceBreak1").textContent =
+      `${sizeLabel} ${colorLabel} × ${state.pages}页 × ${state.copies}份`;
+    document.getElementById("priceBreak1v").textContent = `RM ${base.toFixed(2)}`;
+    const row2 = document.getElementById("priceBreak2Row");
+    if (cover > 0) {
+      row2.classList.remove("hidden");
+      document.getElementById("priceBreak2v").textContent = `RM ${cover.toFixed(2)}`;
+    } else {
+      row2.classList.add("hidden");
+    }
+    document.getElementById("totalPrice").textContent = `RM ${total.toFixed(2)}`;
+  }
+  renderPrice();
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.toggle("show", !!msg);
+  }
+
+  // ---- step 1 -> step 2 ----
+  document.getElementById("toPaymentBtn").addEventListener("click", () => {
+    if (!state.file) { showError("formError", "请先上传要打印的文件"); return; }
+    showError("formError", "");
+    const { total } = calcPrice();
+    document.getElementById("payAmount").textContent = `RM ${total.toFixed(2)}`;
+    document.getElementById("formView").classList.add("hidden");
+    document.getElementById("payView").classList.remove("hidden");
+    window.scrollTo(0,0);
+  });
+  document.getElementById("backBtn").addEventListener("click", () => {
+    document.getElementById("payView").classList.add("hidden");
+    document.getElementById("formView").classList.remove("hidden");
+    window.scrollTo(0,0);
+  });
+
+  // ---- submit order ----
+  document.getElementById("paidBtn").addEventListener("click", async () => {
+    const btn = document.getElementById("paidBtn");
+    const btnText = document.getElementById("paidBtnText");
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span> 提交中...';
+    showError("payError", "");
+
+    try {
+      const { total } = calcPrice();
+      const ext = state.file.name.split(".").pop();
+      const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+
+      const { error: upErr } = await sb.storage
+        .from("print-uploads")
+        .upload(path, state.file, { upsert: false });
+      if (upErr) throw upErr;
+
+      const { data: urlData } = sb.storage.from("print-uploads").getPublicUrl(path);
+      const fileUrl = urlData.publicUrl;
+
+      const { data: orderData, error: insErr } = await sb
+        .from("print_orders")
+        .insert({
+          customer_phone: document.getElementById("phoneInput").value || null,
+          file_url: fileUrl,
+          file_name: state.file.name,
+          paper_size: state.size,
+          color_mode: state.color,
+          pages: state.pages,
+          copies: state.copies,
+          double_sided: state.double === "yes",
+          plastic_cover: state.cover === "yes",
+          price: total,
+          status: "new"
+        })
+        .select()
+        .single();
+      if (insErr) throw insErr;
+
+      notifyWhatsApp(orderData, total);
+
+      document.getElementById("orderIdShow").textContent =
+        "订单号 #" + orderData.id.slice(0, 8).toUpperCase();
+      document.getElementById("payView").classList.add("hidden");
+      document.getElementById("doneView").classList.remove("hidden");
+      window.scrollTo(0,0);
+
+    } catch (err) {
+      console.error(err);
+      showError("payError", "提交失败，请检查网络后重试 (" + (err.message || err) + ")");
+      btn.disabled = false;
+      btnText.textContent = "✓ 我已经付款，提交订单";
+    }
+  });
+
+  function notifyWhatsApp(order, total) {
+    if (!CALLMEBOT_APIKEY || CALLMEBOT_APIKEY.startsWith("PASTE_")) return;
+    const msg =
+      `🖨️ 新打印订单 #${order.id.slice(0,8).toUpperCase()}\n` +
+      `${order.paper_size} ${order.color_mode === "bw" ? "黑白" : "彩色"} · ${order.pages}页 × ${order.copies}份\n` +
+      (order.plastic_cover ? "过胶 ✓\n" : "") +
+      (order.double_sided ? "双面\n" : "单面\n") +
+      `金额 RM ${total.toFixed(2)}\n` +
+      `电话: ${order.customer_phone || "未留"}\n` +
+      `文件: ${order.file_url}`;
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${CALLMEBOT_PHONE}&apikey=${CALLMEBOT_APIKEY}&text=${encodeURIComponent(msg)}`;
+    new Image().src = url;
+  }
+</script>
+
+</body>
+</html>
