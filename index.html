@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Kedai 19 - Print Order</title>
+<title>Kedai 19 - 打印下单 Print Order</title>
 <meta name="theme-color" content="#221F1A">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
@@ -183,6 +183,29 @@
     color:var(--ink-soft);
     line-height:1.5;
   }
+  .howto-toggle{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    color:var(--printed, #3D6FA6);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:10px 0 0;
+  }
+  .howto-box{
+    margin-top:8px;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    padding:10px 12px;
+    font-size:12.5px;
+    line-height:1.7;
+  }
+  .howto-box b{ display:block; margin-bottom:4px; }
+  .howto-box ol{ margin:0; padding-left:18px; }
   .quick-btn{
     margin-top:12px;
     font-size:13px;
@@ -409,6 +432,17 @@
       <div class="file-list" id="fileList"></div>
       <div class="files-total hidden" id="filesTotal"></div>
 
+      <button type="button" class="howto-toggle" id="howtoToggle" data-i18n="howtoToggle">💬 文件在WhatsApp里？点这里看怎么快速传过来</button>
+      <div class="howto-box hidden" id="howtoBox">
+        <b data-i18n="howtoB">一次传很多个文件（不用一个个点）：</b>
+        <ol>
+          <li data-i18n="howtoLi1">在WhatsApp聊天里，长按第一个文件</li>
+          <li data-i18n="howtoLi2">继续点其他文件（可以一次勾几十个）</li>
+          <li data-i18n="howtoLi3">点分享图标 → 选「储存到文件」(iPhone) 或「另存为」(Android)</li>
+          <li data-i18n="howtoLi4">回来这里点上传 → 选「全选」→ 一次全部选中</li>
+        </ol>
+      </div>
+
       <button type="button" class="btn stamp quick-btn hidden" id="quickBtn" data-i18n="quickBtn">⚡ 极速下单（用默认设置，事后我们再跟你确认）</button>
 
       <p class="hint-save" data-i18n="hintSave">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。</p>
@@ -574,6 +608,12 @@
       dropMain: "点击选择文件（可一次选多个）",
       dropMainMore: "+ 继续添加文件",
       dropSub: "支持 PDF / JPG / PNG / DOC / DOCX，单个最大 50MB",
+      howtoToggle: "💬 文件在WhatsApp里？点这里看怎么快速传过来",
+      howtoB: "一次传很多个文件（不用一个个点）：",
+      howtoLi1: "在WhatsApp聊天里，长按第一个文件",
+      howtoLi2: "继续点其他文件（可以一次勾几十个）",
+      howtoLi3: "点分享图标 → 选「储存到文件」(iPhone) 或「另存为」(Android)",
+      howtoLi4: "回来这里点上传 → 选「全选」→ 一次全部选中",
       quickBtn: "⚡ 极速下单（用默认设置，事后我们再跟你确认）",
       hintSave: "📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。",
       s2Title: "打印规格 SPEC",
@@ -625,6 +665,12 @@
       dropMain: "Ketik untuk pilih fail (boleh pilih banyak sekali gus)",
       dropMainMore: "+ Tambah fail lagi",
       dropSub: "Sokong PDF / JPG / PNG / DOC / DOCX, maksimum 50MB setiap fail",
+      howtoToggle: "💬 Fail dalam WhatsApp? Tekan sini untuk cara pantas hantar",
+      howtoB: "Hantar banyak fail sekali gus (tak perlu tekan satu-satu):",
+      howtoLi1: "Dalam chat WhatsApp, tekan lama fail pertama",
+      howtoLi2: "Terus tekan fail lain (boleh pilih puluhan sekali gus)",
+      howtoLi3: "Tekan ikon Share → pilih \"Save to Files\" (iPhone) atau \"Simpan sebagai\" (Android)",
+      howtoLi4: "Kembali sini, tekan Muat Naik → pilih \"Select All\" → semua fail terpilih sekali gus",
       quickBtn: "⚡ Pesanan Pantas (guna tetapan asal, kami sahkan dengan anda selepas ini)",
       hintSave: "📌 Kalau fail ada dalam WhatsApp / Email, simpan dulu ke telefon anda, kemudian kembali sini untuk muat naik. Boleh muat naik banyak gambar atau PDF sekali gus.",
       s2Title: "SPESIFIKASI CETAKAN",
@@ -883,6 +929,11 @@
       addFiles(Array.from(fileInput.files));
       fileInput.value = "";
     }
+  });
+
+  // ---- how-to box ----
+  document.getElementById("howtoToggle").addEventListener("click", () => {
+    document.getElementById("howtoBox").classList.toggle("hidden");
   });
 
   // ---- quick order ----
