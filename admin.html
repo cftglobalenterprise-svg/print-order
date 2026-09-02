@@ -197,13 +197,15 @@
           </div>
           <div class="spec">
             <b>${o.paper_size}</b> · ${o.color_mode === "bw" ? "黑白" : "彩色"} ·
-            ${o.pages}页 × ${o.copies}份 ·
+            ${o.total_pages}页 × ${o.copies}份 ·
             ${o.double_sided ? "双面" : "单面"}
             ${o.plastic_cover ? " · 过胶" : ""}
           </div>
           <div class="phone">📞 ${o.customer_phone || "未留电话"}</div>
           <div class="row-actions">
-            <a class="file-link" href="${o.file_url}" target="_blank" rel="noopener">📄 打开文件</a>
+            ${(o.files || []).map(f =>
+              `<a class="file-link" href="${f.url}" target="_blank" rel="noopener">📄 ${f.name} (${f.pages}页)</a>`
+            ).join("")}
             <select class="status" data-id="${o.id}">
               <option value="new" ${o.status === "new" ? "selected" : ""}>新单</option>
               <option value="paid_confirmed" ${o.status === "paid_confirmed" ? "selected" : ""}>已确认付款</option>
