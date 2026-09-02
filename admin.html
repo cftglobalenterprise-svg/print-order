@@ -216,7 +216,7 @@
 
 <div id="gate" class="gate">
   <h2>🔒 员工专用</h2>
-  <input type="password" id="pin" placeholder="PIN" inputmode="numeric">
+  <input type="password" id="pin" placeholder="密码 Password">
   <button id="gateBtn">进入</button>
   <div class="err hidden" id="gateErr">PIN 不对</div>
 </div>
@@ -241,7 +241,7 @@
 <script>
   const SUPABASE_URL = "https://bkunpzbovsetqdtjlwmf.supabase.co";
   const SUPABASE_KEY = "sb_publishable_-1Hhh1o7Uv4qQNb1NKCKew_7UuG4qpT";
-  const ADMIN_PIN = "1234"; // 先用这个测试，之后想改就改这行
+  const ADMIN_PIN = "Choo-1996"; // 密码，之后想改就改这行
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
