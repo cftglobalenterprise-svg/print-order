@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   :root{
     --paper:#F5F1E6;
@@ -133,6 +134,22 @@
     font-size:11.5px;
     color:var(--ink-soft);
     line-height:1.5;
+  }
+  .page-detect{
+    margin-top:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    display:none;
+    align-items:center;
+    gap:6px;
+  }
+  .page-detect.show{ display:flex; }
+  .page-detect.ok{ color:var(--paid); }
+  .page-detect.warn{ color:var(--ink-soft); }
+  .page-detect .spin-sm{
+    width:11px;height:11px;border:2px solid var(--ink-soft);
+    border-top-color:transparent; border-radius:50%;
+    animation:spin .7s linear infinite;
   }
 
   /* option rows */
@@ -321,6 +338,7 @@
         <span id="fileName"></span>
         <button type="button" id="fileRemove">移除 ✕</button>
       </div>
+      <div class="page-detect" id="pageDetect"></div>
       <p class="hint-save">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。</p>
     </div>
 
@@ -349,7 +367,7 @@
         <span class="opt-label">文件页数 Pages</span>
         <div class="stepper" data-group="pages">
           <button type="button" data-dir="-1">−</button>
-          <input type="text" value="1" inputmode="numeric" readonly>
+          <input type="text" value="1" inputmode="numeric" readonly id="pagesInput">
           <button type="button" data-dir="1">+</button>
         </div>
       </div>
@@ -449,6 +467,9 @@
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
   const state = {
     size: "A4", color: "bw", pages: 1, copies: 1,
     double: "yes", cover: "no", file: null
@@ -490,6 +511,54 @@
   const fileChip = document.getElementById("fileChip");
   const fileName = document.getElementById("fileName");
 
+  const pageDetect = document.getElementById("pageDetect");
+  const pagesInput = document.getElementById("pagesInput");
+
+  function setPages(n) {
+    state.pages = n;
+    pagesInput.value = n;
+    renderPrice();
+  }
+
+  function showDetect(html, cls) {
+    pageDetect.innerHTML = html;
+    pageDetect.className = "page-detect show" + (cls ? " " + cls : "");
+  }
+  function hideDetect() {
+    pageDetect.className = "page-detect";
+    pageDetect.innerHTML = "";
+  }
+
+  async function detectPages(file) {
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+    const isImage = file.type.startsWith("image/");
+
+    if (isImage) {
+      setPages(1);
+      showDetect("🖼️ 图片文件，按 1 页算", "warn");
+      return;
+    }
+
+    if (isPdf) {
+      showDetect('<span class="spin-sm"></span> 正在识别PDF页数...', "warn");
+      try {
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        setPages(pdf.numPages);
+        showDetect(`✓ 自动识别：共 ${pdf.numPages} 页`, "ok");
+      } catch (err) {
+        console.error(err);
+        setPages(1);
+        showDetect("⚠️ 无法自动识别，请手动调整下面的页数", "warn");
+      }
+      return;
+    }
+
+    // doc / docx / 其他类型：没办法在网页里自动数页
+    setPages(1);
+    showDetect("⚠️ 这类文件无法自动识别页数，请手动调整下面的页数", "warn");
+  }
+
   dropZone.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", () => {
     if (fileInput.files && fileInput.files[0]) {
@@ -504,6 +573,7 @@
       fileChip.classList.add("show");
       dropZone.style.display = "none";
       showError("formError", "");
+      detectPages(f);
     }
   });
   document.getElementById("fileRemove").addEventListener("click", (e) => {
@@ -512,6 +582,8 @@
     fileInput.value = "";
     fileChip.classList.remove("show");
     dropZone.style.display = "block";
+    hideDetect();
+    setPages(1);
   });
 
   // ---- price calc ----
