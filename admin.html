@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>打印订单管理 Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F5F1E6; --paper-deep:#EDE7D6; --line:#C9BFA8;
@@ -18,22 +18,23 @@
   *{box-sizing:border-box;}
   body{
     margin:0; background:var(--paper-deep); color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'Inter', sans-serif;
+    font-variant-numeric: tabular-nums;
     padding:16px;
   }
   header{
     max-width:900px; margin:0 auto 16px;
     display:flex; justify-content:space-between; align-items:baseline;
   }
-  header h1{ font-family:'IBM Plex Mono', monospace; font-size:18px; margin:0; }
-  header .count{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); }
+  header h1{ font-family:'Inter', sans-serif; font-size:18px; margin:0; }
+  header .count{ font-family:'Inter', sans-serif; font-size:12px; color:var(--ink-soft); }
 
   .filters{
     max-width:900px; margin:0 auto 14px;
     display:flex; gap:6px; flex-wrap:wrap;
   }
   .filters button{
-    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    font-family:'Inter', sans-serif; font-size:12px;
     padding:6px 12px; border:1.3px solid var(--ink); background:transparent;
     color:var(--ink); cursor:pointer;
   }
@@ -50,9 +51,9 @@
     display:flex; justify-content:space-between; align-items:flex-start;
     gap:10px; margin-bottom:8px;
   }
-  .oid{ font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:700; }
+  .oid{ font-family:'Inter', sans-serif; font-size:13px; font-weight:700; }
   .time{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
-  .price{ font-family:'IBM Plex Mono', monospace; font-size:18px; font-weight:700; color:var(--stamp); flex-shrink:0; }
+  .price{ font-family:'Inter', sans-serif; font-size:18px; font-weight:700; color:var(--stamp); flex-shrink:0; }
 
   .badges{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:2px; }
 
@@ -60,15 +61,15 @@
   .spec b{ font-weight:600; }
 
   .phone-link{
-    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    font-family:'Inter', sans-serif; font-size:12.5px;
     background:none; border:none; padding:0; cursor:pointer;
     color:var(--wa); text-decoration:underline; text-align:left;
   }
-  .phone-none{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft); }
+  .phone-none{ font-family:'Inter', sans-serif; font-size:12.5px; color:var(--ink-soft); }
 
   .file-group{ margin-top:10px; }
   .file-group-title{
-    font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    font-family:'Inter', sans-serif; font-size:10.5px;
     color:var(--ink-soft); letter-spacing:0.04em;
     margin-bottom:4px;
   }
@@ -80,13 +81,13 @@
   .file-row-line.downloaded{ opacity:0.55; }
   .file-row-line:last-child{ border-bottom:none; }
   .file-row-line-name{
-    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    font-family:'Inter', sans-serif; font-size:12px;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .file-row-line-pages{ color:var(--ink-soft); }
   .dl-check{ color:var(--paid); margin-right:4px; }
   .dl-btn{
-    font-family:'IBM Plex Mono', monospace; font-size:11.5px;
+    font-family:'Inter', sans-serif; font-size:11.5px;
     background:var(--paper-deep); border:1.3px solid var(--ink);
     padding:4px 9px; cursor:pointer; color:var(--ink); flex-shrink:0;
   }
@@ -102,7 +103,7 @@
   }
   .checklist label{
     display:flex; align-items:center; gap:6px;
-    font-family:'IBM Plex Mono', monospace; font-size:12.5px; cursor:pointer;
+    font-family:'Inter', sans-serif; font-size:12.5px; cursor:pointer;
   }
   .checklist input[type=checkbox]{
     width:16px; height:16px; accent-color: var(--ink); cursor:pointer;
@@ -112,7 +113,7 @@
     display:flex; gap:8px; margin-top:10px;
   }
   .receipt-btn, .delete-btn{
-    font-family:'IBM Plex Mono', monospace; font-size:11.5px;
+    font-family:'Inter', sans-serif; font-size:11.5px;
     padding:6px 10px; border:1.3px solid var(--ink); background:transparent;
     color:var(--ink); cursor:pointer;
   }
@@ -121,7 +122,7 @@
   .delete-btn:active{ background:var(--stamp); color:var(--paper); }
 
   .badge{
-    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    font-family:'Inter', sans-serif; font-size:11px;
     padding:3px 8px; border-radius:2px; font-weight:600;
   }
   .badge.quick{ background:#F3E3D0; color:var(--stamp); }
@@ -131,19 +132,19 @@
   .badge.printed-badge{ background:var(--printed-bg); color:var(--printed); }
   .badge.collected-badge{ background:var(--collected-bg); color:var(--collected); }
 
-  .empty{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:13px; }
+  .empty{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'Inter', sans-serif; font-size:13px; }
 
   .gate{
     max-width:320px; margin:120px auto; text-align:center;
   }
-  .gate h2{ font-family:'IBM Plex Mono', monospace; }
+  .gate h2{ font-family:'Inter', sans-serif; }
   .gate input{
     width:100%; padding:10px; font-size:16px; text-align:center;
     border:1.3px solid var(--ink); background:var(--paper); margin-bottom:10px;
     letter-spacing:0.2em;
   }
   .gate button{
-    width:100%; padding:12px; font-family:'IBM Plex Mono', monospace;
+    width:100%; padding:12px; font-family:'Inter', sans-serif;
     background:var(--ink); color:var(--paper); border:none; cursor:pointer;
   }
   .gate .err{ color:var(--stamp); font-size:12px; margin-top:8px; }
@@ -157,7 +158,7 @@
     #receiptArea, #receiptArea *{ visibility:visible; }
     #receiptArea{
       display:block; position:absolute; top:0; left:0; width:100%;
-      font-family:'IBM Plex Sans', sans-serif; color:#221F1A;
+      font-family:'Inter', sans-serif; color:#221F1A;
     }
     #receiptArea .r-topbar{
       height:6px; background:#C1432A; margin-bottom:22px;
@@ -167,20 +168,20 @@
       margin-bottom:6px;
     }
     #receiptArea .r-brand h2{
-      font-family:'IBM Plex Mono', monospace; font-size:26px; margin:0; letter-spacing:0.02em;
+      font-family:'Inter', sans-serif; font-size:26px; margin:0; letter-spacing:0.02em;
     }
     #receiptArea .r-brand .r-tagline{
-      font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.12em;
+      font-family:'Inter', sans-serif; font-size:11px; letter-spacing:0.12em;
       color:#6B6354; margin-top:2px;
     }
     #receiptArea .r-oid{
-      text-align:right; font-family:'IBM Plex Mono', monospace;
+      text-align:right; font-family:'Inter', sans-serif;
     }
     #receiptArea .r-oid .r-oid-num{ font-size:20px; font-weight:700; color:#C1432A; }
     #receiptArea .r-oid .r-oid-date{ font-size:11px; color:#6B6354; margin-top:2px; }
     #receiptArea .r-line{ border-top:1.5px dashed #C9BFA8; margin:16px 0; }
     #receiptArea .r-section-title{
-      font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.1em;
+      font-family:'Inter', sans-serif; font-size:10.5px; letter-spacing:0.1em;
       color:#6B6354; margin-bottom:8px;
     }
     #receiptArea .r-row{
@@ -188,23 +189,23 @@
       font-size:13.5px; padding:4px 0;
     }
     #receiptArea .r-row .r-label{ color:#6B6354; }
-    #receiptArea .r-file-row{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
+    #receiptArea .r-file-row{ font-family:'Inter', sans-serif; font-size:12.5px; }
     #receiptArea .r-total-block{
       background:#EDE7D6; padding:12px 16px; margin-top:6px;
     }
     #receiptArea .r-row.r-total{
-      font-family:'IBM Plex Mono', monospace; font-size:19px; font-weight:700;
+      font-family:'Inter', sans-serif; font-size:19px; font-weight:700;
       border-top:1.5px solid #221F1A; margin-top:6px; padding-top:10px;
     }
     #receiptArea .r-row.r-total .r-total-val{ color:#C1432A; }
     #receiptArea .r-pay-status{
       display:inline-block; margin-top:4px;
-      font-family:'IBM Plex Mono', monospace; font-size:11.5px; font-weight:700;
+      font-family:'Inter', sans-serif; font-size:11.5px; font-weight:700;
       border:1.3px solid #221F1A; padding:4px 10px;
     }
     #receiptArea .r-foot{
       text-align:center; margin-top:40px;
-      font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:0.06em;
+      font-family:'Inter', sans-serif; font-size:13px; letter-spacing:0.06em;
       color:#6B6354;
     }
     #receiptArea .r-foot .r-stamp-word{
