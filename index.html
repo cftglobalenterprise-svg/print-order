@@ -642,6 +642,9 @@
       tooLarge: (name) => `"${name}" 太大了，单个文件最大 50MB`,
       submitFailed: (msg) => `提交失败，请检查网络后重试 (${msg})`,
       priceLine: (size, color, pages, copies) => `${size} ${color} × ${pages}页 × ${copies}份`,
+      uploadingProgress: (i, n) => `正在上传 ${i}/${n} 个文件...`,
+      uploadTimeout: (name) => `"${name}" 上传超时，请检查网络后重试`,
+      submitTimeout: "提交超时，请检查网络后重试",
       langBtn: "BM"
     },
     ms: {
@@ -699,6 +702,9 @@
       tooLarge: (name) => `"${name}" terlalu besar — maksimum 50MB setiap fail`,
       submitFailed: (msg) => `Penghantaran gagal, sila semak sambungan dan cuba lagi (${msg})`,
       priceLine: (size, color, pages, copies) => `${size} ${color} × ${pages} muka × ${copies} salinan`,
+      uploadingProgress: (i, n) => `Memuat naik fail ${i}/${n}...`,
+      uploadTimeout: (name) => `"${name}" tamat masa muat naik, sila semak sambungan dan cuba lagi`,
+      submitTimeout: "Tamat masa penghantaran, sila semak sambungan dan cuba lagi",
       langBtn: "中/EN"
     }
   };
@@ -801,6 +807,49 @@
 
   function totalPages() {
     return state.files.reduce((sum, f) => sum + f.pages, 0);
+  }
+
+  // 手机拍的照片通常很大（几MB），网络慢的时候上传很容易卡住
+  // 上传前先在手机上压缩一下，体积能小很多，上传快很多
+  function compressImageIfNeeded(file) {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith("image/") || file.size < 1.2 * 1024 * 1024) {
+        resolve(file);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1600;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+            else { width = Math.round(width * maxDim / height); height = maxDim; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (!blob) { resolve(file); return; }
+            resolve(new File([blob], file.name, { type: "image/jpeg" }));
+          }, "image/jpeg", 0.75);
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // 上传卡住不动很久也不报错的话，用户不知道要不要等——加个超时，卡太久就直接报错让他们重试
+  function withTimeout(promise, ms, errMsg) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(errMsg)), ms))
+    ]);
   }
 
   function renderFileList() {
@@ -1049,35 +1098,50 @@
       const { total, pages } = calcPrice();
 
       const uploadedFiles = [];
-      for (const entry of state.files) {
+      for (let i = 0; i < state.files.length; i++) {
+        const entry = state.files[i];
+        const progressText = dict.uploadingProgress(i + 1, state.files.length);
+        if (paymentMethod === "online_claimed") {
+          paidBtnText.innerHTML = `<span class="spinner"></span> ${progressText}`;
+        } else {
+          storeBtnText.innerHTML = `<span class="spinner"></span> ${progressText}`;
+        }
+
+        const uploadFile = await compressImageIfNeeded(entry.file);
         const ext = entry.file.name.split(".").pop();
         const path = `${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
-        const { error: upErr } = await sb.storage
-          .from("print-uploads")
-          .upload(path, entry.file, { upsert: false });
+        const { error: upErr } = await withTimeout(
+          sb.storage.from("print-uploads").upload(path, uploadFile, { upsert: false }),
+          30000,
+          dict.uploadTimeout(entry.file.name)
+        );
         if (upErr) throw upErr;
         const { data: urlData } = sb.storage.from("print-uploads").getPublicUrl(path);
         uploadedFiles.push({ name: entry.file.name, url: urlData.publicUrl, pages: entry.pages });
       }
 
-      const { data: orderData, error: insErr } = await sb
-        .from("print_orders")
-        .insert({
-          customer_phone: document.getElementById("phoneInput").value || null,
-          files: uploadedFiles,
-          total_pages: pages,
-          paper_size: state.size,
-          color_mode: state.color,
-          copies: state.copies,
-          double_sided: state.double === "yes",
-          plastic_cover: state.cover === "yes",
-          price: total,
-          status: "new",
-          payment_method: paymentMethod,
-          notes: state.isQuick ? "⚡极速下单：客人未逐项确认规格，请致电确认后再打印" : null
-        })
-        .select()
-        .single();
+      const { data: orderData, error: insErr } = await withTimeout(
+        sb
+          .from("print_orders")
+          .insert({
+            customer_phone: document.getElementById("phoneInput").value || null,
+            files: uploadedFiles,
+            total_pages: pages,
+            paper_size: state.size,
+            color_mode: state.color,
+            copies: state.copies,
+            double_sided: state.double === "yes",
+            plastic_cover: state.cover === "yes",
+            price: total,
+            status: "new",
+            payment_method: paymentMethod,
+            notes: state.isQuick ? "⚡极速下单：客人未逐项确认规格，请致电确认后再打印" : null
+          })
+          .select()
+          .single(),
+        20000,
+        dict.submitTimeout
+      );
       if (insErr) throw insErr;
 
       notifyWhatsApp(orderData, total, paymentMethod);
