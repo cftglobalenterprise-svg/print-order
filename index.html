@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>CFT 打印订单 Print Order</title>
+<meta name="theme-color" content="#221F1A">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -165,6 +168,34 @@
     font-size:11.5px;
     color:var(--ink-soft);
     line-height:1.5;
+  }
+  .howto-toggle{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    color:var(--printed, #3D6FA6);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:10px 0 0;
+  }
+  .howto-box{
+    margin-top:8px;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    padding:10px 12px;
+    font-size:12.5px;
+    line-height:1.7;
+  }
+  .howto-box b{ display:block; margin-bottom:4px; }
+  .howto-box ol{ margin:0; padding-left:18px; }
+  .quick-btn{
+    margin-top:12px;
+    font-size:13px;
+    padding:12px;
   }
   .spin-sm{
     width:11px;height:11px;border:2px solid var(--ink-soft);
@@ -356,6 +387,20 @@
       <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
       <div class="file-list" id="fileList"></div>
       <div class="files-total hidden" id="filesTotal"></div>
+
+      <button type="button" class="howto-toggle" id="howtoToggle">💬 文件在WhatsApp里？点这里看怎么快速传过来</button>
+      <div class="howto-box hidden" id="howtoBox">
+        <b>一次传很多个文件（不用一个个点）：</b>
+        <ol>
+          <li>在WhatsApp聊天里，长按第一个文件</li>
+          <li>继续点其他文件（可以一次勾几十个）</li>
+          <li>点分享图标 → 选「储存到文件」(iPhone) 或「另存为」(Android)</li>
+          <li>回来这里点上传 → 选「全选」→ 一次全部选中</li>
+        </ol>
+      </div>
+
+      <button type="button" class="btn stamp quick-btn" id="quickBtn">⚡ 极速下单（用默认设置，事后我们再跟你确认）</button>
+
       <p class="hint-save">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。</p>
     </div>
 
@@ -638,6 +683,67 @@
     }
   });
 
+  // ---- how-to box ----
+  document.getElementById("howtoToggle").addEventListener("click", () => {
+    document.getElementById("howtoBox").classList.toggle("hidden");
+  });
+
+  // ---- quick order ----
+  document.getElementById("quickBtn").addEventListener("click", () => {
+    if (state.files.length === 0) { showError("formError", "请先上传要打印的文件"); return; }
+    if (state.files.some(f => f.status === "detecting")) { showError("formError", "文件还在识别中，请稍等一下"); return; }
+    // 重置成默认设置
+    state.size = "A4"; state.color = "bw"; state.copies = 1;
+    state.double = "yes"; state.cover = "no";
+    state.isQuick = true;
+    document.querySelectorAll(".chips").forEach(g => {
+      g.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+      const key = g.dataset.group;
+      const match = g.querySelector(`[data-value="${state[key]}"]`);
+      if (match) match.classList.add("active");
+    });
+    document.querySelectorAll(".stepper").forEach(s => {
+      const key = s.dataset.group;
+      const input = s.querySelector("input");
+      if (input) input.value = state[key];
+    });
+    showError("formError", "");
+    const { total } = calcPrice();
+    document.getElementById("payAmount").textContent = `RM ${total.toFixed(2)}`;
+    document.getElementById("formView").classList.add("hidden");
+    document.getElementById("payView").classList.remove("hidden");
+    window.scrollTo(0,0);
+  });
+
+  // ---- Web Share Target: 从 WhatsApp「分享」直接进来的文件 ----
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(err => console.error("SW register failed", err));
+  }
+
+  async function loadSharedFiles() {
+    if (new URLSearchParams(location.search).get("shared") !== "1") return;
+    try {
+      const cache = await caches.open("cft-print-share-v1");
+      const metaRes = await cache.match("shared-meta");
+      if (!metaRes) return;
+      const meta = await metaRes.json();
+      const files = [];
+      for (const m of meta) {
+        const res = await cache.match(m.key);
+        if (!res) continue;
+        const blob = await res.blob();
+        files.push(new File([blob], m.name, { type: m.type }));
+        await cache.delete(m.key);
+      }
+      await cache.delete("shared-meta");
+      if (files.length) addFiles(files);
+      history.replaceState({}, "", location.pathname);
+    } catch (err) {
+      console.error("load shared files failed", err);
+    }
+  }
+  loadSharedFiles();
+
   // ---- price calc ----
   function calcPrice() {
     const rate = RATES[state.size][state.color];
@@ -674,6 +780,7 @@
   document.getElementById("toPaymentBtn").addEventListener("click", () => {
     if (state.files.length === 0) { showError("formError", "请先上传要打印的文件"); return; }
     if (state.files.some(f => f.status === "detecting")) { showError("formError", "文件还在识别中，请稍等一下"); return; }
+    state.isQuick = false;
     showError("formError", "");
     const { total } = calcPrice();
     document.getElementById("payAmount").textContent = `RM ${total.toFixed(2)}`;
@@ -722,7 +829,8 @@
           double_sided: state.double === "yes",
           plastic_cover: state.cover === "yes",
           price: total,
-          status: "new"
+          status: "new",
+          notes: state.isQuick ? "⚡极速下单：客人未逐项确认规格，请致电确认后再打印" : null
         })
         .select()
         .single();
