@@ -76,6 +76,7 @@
   .badge.paid_confirmed{ background:var(--paid-bg); color:var(--paid); }
   .badge.printed{ background:var(--printed-bg); color:var(--printed); }
   .badge.collected{ background:var(--collected-bg); color:var(--collected); }
+  .badge.quick{ background:#F3E3D0; color:var(--stamp); }
 
   .empty{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:13px; }
 
@@ -191,6 +192,7 @@
             <div>
               <span class="oid">#${o.id.slice(0,8).toUpperCase()}</span>
               <span class="badge ${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
+              ${o.notes ? '<span class="badge quick">⚡ 待确认</span>' : ''}
               <div class="time">${t}</div>
             </div>
             <div class="price">RM ${Number(o.price).toFixed(2)}</div>
