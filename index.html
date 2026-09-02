@@ -432,20 +432,7 @@
       <div class="file-list" id="fileList"></div>
       <div class="files-total hidden" id="filesTotal"></div>
 
-      <button type="button" class="howto-toggle" id="howtoToggle" data-i18n="howtoToggle">💬 文件在WhatsApp里？点这里看怎么快速传过来</button>
-      <div class="howto-box hidden" id="howtoBox">
-        <b data-i18n="howtoB">一次传很多个文件（不用一个个点）：</b>
-        <ol>
-          <li data-i18n="howtoLi1">在WhatsApp聊天里，长按第一个文件</li>
-          <li data-i18n="howtoLi2">继续点其他文件（可以一次勾几十个）</li>
-          <li data-i18n="howtoLi3">点分享图标 → 选「储存到文件」(iPhone) 或「另存为」(Android)</li>
-          <li data-i18n="howtoLi4">回来这里点上传 → 选「全选」→ 一次全部选中</li>
-        </ol>
-      </div>
-
       <button type="button" class="btn stamp quick-btn hidden" id="quickBtn" data-i18n="quickBtn">⚡ 极速下单（用默认设置，事后我们再跟你确认）</button>
-
-      <p class="hint-save" data-i18n="hintSave">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。</p>
     </div>
 
     <div class="perf"></div>
@@ -929,11 +916,6 @@
       addFiles(Array.from(fileInput.files));
       fileInput.value = "";
     }
-  });
-
-  // ---- how-to box ----
-  document.getElementById("howtoToggle").addEventListener("click", () => {
-    document.getElementById("howtoBox").classList.toggle("hidden");
   });
 
   // ---- quick order ----
