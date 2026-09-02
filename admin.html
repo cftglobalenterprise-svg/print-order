@@ -13,6 +13,7 @@
     --paid:#4B7A51; --paid-bg:#E7EFE4;
     --printed:#3D6FA6; --printed-bg:#E4EDF5;
     --collected:#6B6354; --collected-bg:#E8E4D8;
+    --wa:#3FA046;
   }
   *{box-sizing:border-box;}
   body{
@@ -44,41 +45,74 @@
     background:var(--paper); border:1.3px solid var(--ink);
     padding:14px 16px;
   }
+  .card.is-collected{ opacity:0.6; }
   .card-top{
     display:flex; justify-content:space-between; align-items:flex-start;
     gap:10px; margin-bottom:8px;
   }
   .oid{ font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:700; }
-  .time{ font-size:11.5px; color:var(--ink-soft); }
-  .price{ font-family:'IBM Plex Mono', monospace; font-size:18px; font-weight:700; color:var(--stamp); }
+  .time{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
+  .price{ font-family:'IBM Plex Mono', monospace; font-size:18px; font-weight:700; color:var(--stamp); flex-shrink:0; }
 
-  .spec{ font-size:13px; margin-bottom:8px; line-height:1.6; }
+  .badges{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:2px; }
+
+  .spec{ font-size:13px; margin:8px 0; line-height:1.6; }
   .spec b{ font-weight:600; }
-  .phone{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
 
-  .row-actions{
-    display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
-    align-items:center;
+  .phone-link{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    background:none; border:none; padding:0; cursor:pointer;
+    color:var(--wa); text-decoration:underline; text-align:left;
   }
-  .file-link{
+  .phone-none{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft); }
+
+  .file-group{ margin-top:10px; }
+  .file-group-title{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    color:var(--ink-soft); letter-spacing:0.04em;
+    margin-bottom:4px;
+  }
+  .file-row-line{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:6px 0; border-bottom:1px dashed var(--line);
+    gap:8px;
+  }
+  .file-row-line:last-child{ border-bottom:none; }
+  .file-row-line-name{
     font-family:'IBM Plex Mono', monospace; font-size:12px;
-    color:var(--printed); text-decoration:underline;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
-  select.status{
-    font-family:'IBM Plex Mono', monospace; font-size:12px;
-    padding:6px 8px; border:1.3px solid var(--ink); background:var(--paper);
+  .file-row-line-pages{ color:var(--ink-soft); }
+  .dl-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px;
+    background:var(--paper-deep); border:1.3px solid var(--ink);
+    padding:4px 9px; cursor:pointer; color:var(--ink); flex-shrink:0;
   }
+  .dl-btn:active{ background:var(--ink); color:var(--paper); }
+  .dl-btn:disabled{ opacity:0.5; cursor:default; }
+
+  .checklist{
+    display:flex; gap:16px; flex-wrap:wrap; align-items:center;
+    margin-top:12px; padding-top:10px; border-top:1px solid rgba(201,191,168,0.6);
+  }
+  .checklist label{
+    display:flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; cursor:pointer;
+  }
+  .checklist input[type=checkbox]{
+    width:16px; height:16px; accent-color: var(--ink); cursor:pointer;
+  }
+
   .badge{
     font-family:'IBM Plex Mono', monospace; font-size:11px;
     padding:3px 8px; border-radius:2px; font-weight:600;
   }
-  .badge.new{ background:#F3E3D0; color:var(--stamp); }
-  .badge.paid_confirmed{ background:var(--paid-bg); color:var(--paid); }
-  .badge.printed{ background:var(--printed-bg); color:var(--printed); }
-  .badge.collected{ background:var(--collected-bg); color:var(--collected); }
   .badge.quick{ background:#F3E3D0; color:var(--stamp); }
-  .badge.pay-online{ background:var(--paid-bg); color:var(--paid); }
+  .badge.pay-online{ background:#F3E3D0; color:#B57A17; }
   .badge.pay-store{ background:#F3E3D0; color:#B57A17; }
+  .badge.pay-done{ background:var(--paid-bg); color:var(--paid); }
+  .badge.printed-badge{ background:var(--printed-bg); color:var(--printed); }
+  .badge.collected-badge{ background:var(--collected-bg); color:var(--collected); }
 
   .empty{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:13px; }
 
@@ -115,9 +149,8 @@
   </header>
   <div class="filters" id="filters">
     <button data-f="all" class="active">全部</button>
-    <button data-f="new">新单</button>
-    <button data-f="paid_confirmed">已确认付款</button>
-    <button data-f="printed">已打印</button>
+    <button data-f="pending">待处理</button>
+    <button data-f="printed">已打印待取</button>
     <button data-f="collected">已取件</button>
   </div>
   <div class="list" id="list"></div>
@@ -130,10 +163,6 @@
   const ADMIN_PIN = "1234"; // 先用这个测试，之后想改就改这行
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  const STATUS_LABEL = {
-    new: "新单", paid_confirmed: "已确认付款", printed: "已打印", collected: "已取件"
-  };
 
   document.getElementById("gateBtn").addEventListener("click", tryEnter);
   document.getElementById("pin").addEventListener("keydown", e => { if (e.key === "Enter") tryEnter(); });
@@ -156,6 +185,7 @@
 
   let orders = [];
   let currentFilter = "all";
+  const list = document.getElementById("list");
 
   document.querySelectorAll("#filters button").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -176,9 +206,63 @@
     render();
   }
 
+  // ---- helpers ----
+  function rank(o) {
+    if (o.collected) return 2;
+    if (o.printed) return 1;
+    return 0;
+  }
+  function matchesFilter(o) {
+    if (currentFilter === "all") return true;
+    if (currentFilter === "pending") return !o.printed && !o.collected;
+    if (currentFilter === "printed") return o.printed && !o.collected;
+    if (currentFilter === "collected") return !!o.collected;
+    return true;
+  }
+  function categorize(name) {
+    const ext = (name.split(".").pop() || "").toLowerCase();
+    if (ext === "pdf") return "PDF";
+    if (["jpg","jpeg","png","gif","webp","heic"].includes(ext)) return "图片";
+    if (["doc","docx"].includes(ext)) return "Word 文档";
+    return "其他文件";
+  }
+  function renderFiles(files) {
+    const groups = {};
+    (files || []).forEach(f => {
+      const cat = categorize(f.name);
+      (groups[cat] = groups[cat] || []).push(f);
+    });
+    const order = ["PDF", "图片", "Word 文档", "其他文件"];
+    return order.filter(cat => groups[cat]).map(cat => `
+      <div class="file-group">
+        <div class="file-group-title">${cat} · ${groups[cat].length}个</div>
+        ${groups[cat].map(f => `
+          <div class="file-row-line">
+            <span class="file-row-line-name">${f.name} <span class="file-row-line-pages">(${f.pages}页)</span></span>
+            <button type="button" class="dl-btn" data-url="${f.url}" data-name="${f.name}">⬇ 下载</button>
+          </div>
+        `).join("")}
+      </div>
+    `).join("");
+  }
+  function normalizePhone(raw) {
+    let digits = raw.replace(/\D/g, "");
+    if (digits.startsWith("60")) return digits;
+    if (digits.startsWith("0")) return "60" + digits.slice(1);
+    return "60" + digits;
+  }
+  function paymentBadge(o) {
+    if (o.paid) return `<span class="badge pay-done">✓ 已收款</span>`;
+    if (o.payment_method === "online_claimed") return `<span class="badge pay-online">💳 待核实付款</span>`;
+    return `<span class="badge pay-store">🏪 到店付款(未收)</span>`;
+  }
+
   function render() {
-    const list = document.getElementById("list");
-    const filtered = currentFilter === "all" ? orders : orders.filter(o => o.status === currentFilter);
+    const filtered = orders.filter(matchesFilter).sort((a, b) => {
+      const r = rank(a) - rank(b);
+      if (r !== 0) return r;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
     document.getElementById("countLabel").textContent = `共 ${filtered.length} 单`;
 
     if (filtered.length === 0) {
@@ -188,14 +272,18 @@
 
     list.innerHTML = filtered.map(o => {
       const t = new Date(o.created_at).toLocaleString("zh-CN", { dateStyle: "short", timeStyle: "short" });
+      const shortId = o.id.slice(0,8).toUpperCase();
       return `
-        <div class="card">
+        <div class="card ${o.collected ? "is-collected" : ""}">
           <div class="card-top">
             <div>
-              <span class="oid">#${o.id.slice(0,8).toUpperCase()}</span>
-              <span class="badge ${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
-              ${o.notes ? '<span class="badge quick">⚡ 待确认</span>' : ''}
-              <span class="badge ${o.payment_method === 'online_claimed' ? 'pay-online' : 'pay-store'}">${o.payment_method === 'online_claimed' ? '💳 待核实付款' : '🏪 到店付款'}</span>
+              <span class="oid">#${shortId}</span>
+              <div class="badges">
+                ${paymentBadge(o)}
+                ${o.printed ? '<span class="badge printed-badge">🖨 已打印</span>' : ''}
+                ${o.collected ? '<span class="badge collected-badge">📦 已取件</span>' : ''}
+                ${o.notes ? '<span class="badge quick">⚡ 待确认</span>' : ''}
+              </div>
               <div class="time">${t}</div>
             </div>
             <div class="price">RM ${Number(o.price).toFixed(2)}</div>
@@ -206,33 +294,78 @@
             ${o.double_sided ? "双面" : "单面"}
             ${o.plastic_cover ? " · 过胶" : ""}
           </div>
-          <div class="phone">📞 ${o.customer_phone || "未留电话"}</div>
-          <div class="row-actions">
-            ${(o.files || []).map(f =>
-              `<a class="file-link" href="${f.url}" target="_blank" rel="noopener">📄 ${f.name} (${f.pages}页)</a>`
-            ).join("")}
-            <select class="status" data-id="${o.id}">
-              <option value="new" ${o.status === "new" ? "selected" : ""}>新单</option>
-              <option value="paid_confirmed" ${o.status === "paid_confirmed" ? "selected" : ""}>已确认付款</option>
-              <option value="printed" ${o.status === "printed" ? "selected" : ""}>已打印</option>
-              <option value="collected" ${o.status === "collected" ? "selected" : ""}>已取件</option>
-            </select>
+          ${o.customer_phone
+            ? `<button type="button" class="phone-link" data-phone="${o.customer_phone}" data-oid="${shortId}">📞 ${o.customer_phone} · 发WhatsApp →</button>`
+            : `<div class="phone-none">📞 未留电话</div>`}
+
+          ${renderFiles(o.files)}
+
+          <div class="checklist">
+            <label><input type="checkbox" class="chk" data-id="${o.id}" data-field="paid" ${o.paid ? "checked" : ""}> 已收款</label>
+            <label><input type="checkbox" class="chk" data-id="${o.id}" data-field="printed" ${o.printed ? "checked" : ""}> 已打印</label>
+            <label><input type="checkbox" class="chk" data-id="${o.id}" data-field="collected" ${o.collected ? "checked" : ""}> 已取件</label>
           </div>
         </div>
       `;
     }).join("");
-
-    list.querySelectorAll("select.status").forEach(sel => {
-      sel.addEventListener("change", async () => {
-        const id = sel.dataset.id;
-        const { error } = await sb.from("print_orders").update({ status: sel.value }).eq("id", id);
-        if (error) { alert("更新失败: " + error.message); return; }
-        const o = orders.find(x => x.id === id);
-        if (o) o.status = sel.value;
-        render();
-      });
-    });
   }
+
+  // ---- delegated events (list is re-rendered often, bind once) ----
+  list.addEventListener("click", async (e) => {
+    const dlBtn = e.target.closest(".dl-btn");
+    if (dlBtn) {
+      dlBtn.disabled = true;
+      const orig = dlBtn.textContent;
+      dlBtn.textContent = "下载中...";
+      try {
+        const res = await fetch(dlBtn.dataset.url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = dlBtn.dataset.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+      } catch (err) {
+        alert("下载失败: " + err.message);
+      } finally {
+        dlBtn.disabled = false;
+        dlBtn.textContent = orig;
+      }
+      return;
+    }
+
+    const phoneBtn = e.target.closest(".phone-link");
+    if (phoneBtn) {
+      const phone = normalizePhone(phoneBtn.dataset.phone);
+      const msg = `您好！您在CFT打印的订单 #${phoneBtn.dataset.oid} 已经打印好了，随时可以过来店里取件 😊`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+      return;
+    }
+  });
+
+  list.addEventListener("change", async (e) => {
+    const chk = e.target.closest(".chk");
+    if (!chk) return;
+    const id = chk.dataset.id;
+    const field = chk.dataset.field;
+    const value = chk.checked;
+    const o = orders.find(x => x.id === id);
+    if (!o) return;
+
+    const updates = { [field]: value };
+    // 取件了一定代表已经打印过；取消打印勾选时，取件也要跟着取消
+    if (field === "collected" && value) updates.printed = true;
+    if (field === "printed" && !value && o.collected) updates.collected = false;
+
+    Object.assign(o, updates);
+    render();
+
+    const { error } = await sb.from("print_orders").update(updates).eq("id", id);
+    if (error) { alert("更新失败: " + error.message); }
+  });
 
   // 每 20 秒自动刷新一次，看有没有新单
   setInterval(() => {
