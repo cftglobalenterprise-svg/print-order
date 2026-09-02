@@ -152,18 +152,65 @@
   /* 收据打印区 - 平时藏起来，打印时才出现 */
   #receiptArea{ display:none; }
   @media print{
+    @page{ size: A4; margin: 16mm; }
     body *{ visibility:hidden; }
     #receiptArea, #receiptArea *{ visibility:visible; }
     #receiptArea{
       display:block; position:absolute; top:0; left:0; width:100%;
-      padding:20px; font-family:'IBM Plex Mono', monospace; color:#000;
+      font-family:'IBM Plex Sans', sans-serif; color:#221F1A;
     }
-    #receiptArea h2{ text-align:center; margin:0 0 2px; font-size:18px; }
-    #receiptArea .r-sub{ text-align:center; font-size:11px; margin-bottom:14px; }
-    #receiptArea .r-line{ border-top:1px dashed #000; margin:10px 0; }
-    #receiptArea .r-row{ display:flex; justify-content:space-between; font-size:13px; margin:3px 0; }
-    #receiptArea .r-total{ font-size:16px; font-weight:700; }
-    #receiptArea .r-foot{ text-align:center; margin-top:16px; font-size:12px; }
+    #receiptArea .r-topbar{
+      height:6px; background:#C1432A; margin-bottom:22px;
+    }
+    #receiptArea .r-head{
+      display:flex; justify-content:space-between; align-items:flex-start;
+      margin-bottom:6px;
+    }
+    #receiptArea .r-brand h2{
+      font-family:'IBM Plex Mono', monospace; font-size:26px; margin:0; letter-spacing:0.02em;
+    }
+    #receiptArea .r-brand .r-tagline{
+      font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.12em;
+      color:#6B6354; margin-top:2px;
+    }
+    #receiptArea .r-oid{
+      text-align:right; font-family:'IBM Plex Mono', monospace;
+    }
+    #receiptArea .r-oid .r-oid-num{ font-size:20px; font-weight:700; color:#C1432A; }
+    #receiptArea .r-oid .r-oid-date{ font-size:11px; color:#6B6354; margin-top:2px; }
+    #receiptArea .r-line{ border-top:1.5px dashed #C9BFA8; margin:16px 0; }
+    #receiptArea .r-section-title{
+      font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.1em;
+      color:#6B6354; margin-bottom:8px;
+    }
+    #receiptArea .r-row{
+      display:flex; justify-content:space-between;
+      font-size:13.5px; padding:4px 0;
+    }
+    #receiptArea .r-row .r-label{ color:#6B6354; }
+    #receiptArea .r-file-row{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
+    #receiptArea .r-total-block{
+      background:#EDE7D6; padding:12px 16px; margin-top:6px;
+    }
+    #receiptArea .r-row.r-total{
+      font-family:'IBM Plex Mono', monospace; font-size:19px; font-weight:700;
+      border-top:1.5px solid #221F1A; margin-top:6px; padding-top:10px;
+    }
+    #receiptArea .r-row.r-total .r-total-val{ color:#C1432A; }
+    #receiptArea .r-pay-status{
+      display:inline-block; margin-top:4px;
+      font-family:'IBM Plex Mono', monospace; font-size:11.5px; font-weight:700;
+      border:1.3px solid #221F1A; padding:4px 10px;
+    }
+    #receiptArea .r-foot{
+      text-align:center; margin-top:40px;
+      font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:0.06em;
+      color:#6B6354;
+    }
+    #receiptArea .r-foot .r-stamp-word{
+      display:inline-block; border:2px solid #4B7A51; color:#4B7A51;
+      transform:rotate(-3deg); padding:6px 14px; font-weight:700; margin-bottom:10px;
+    }
   }
 </style>
 </head>
@@ -309,28 +356,51 @@
     const coverRate = { A5:3.00, A3:5.00, A4:3.00 };
     const base = (rate[o.paper_size]?.[o.color_mode] || 0) * o.total_pages * o.copies;
     const cover = o.plastic_cover ? (coverRate[o.paper_size] || 0) * o.copies : 0;
-    const fileLines = (o.files || []).map(f => `<div class="r-row"><span>· ${f.name}</span><span>${f.pages}页</span></div>`).join("");
-    const payText = o.paid ? "已收款 PAID" : (o.payment_method === "online_claimed" ? "线上已付(待核实)" : "到店付款(未收)");
+    const fileLines = (o.files || []).map(f =>
+      `<div class="r-row r-file-row"><span>· ${f.name}</span><span>${f.pages} 页</span></div>`
+    ).join("");
+    const payText = o.paid ? "✓ 已收款 PAID" : (o.payment_method === "online_claimed" ? "💳 线上已付（待核实）" : "🏪 到店付款（未收）");
     return `
-      <h2>KEDAI 19</h2>
-      <div class="r-sub">打印服务收据 Print Receipt</div>
+      <div class="r-topbar"></div>
+      <div class="r-head">
+        <div class="r-brand">
+          <h2>KEDAI 19</h2>
+          <div class="r-tagline">PRINT SERVICE RECEIPT · 打印服务收据</div>
+        </div>
+        <div class="r-oid">
+          <div class="r-oid-num">#${shortId}</div>
+          <div class="r-oid-date">${t}</div>
+        </div>
+      </div>
+
       <div class="r-line"></div>
-      <div class="r-row"><span>订单号</span><span>#${shortId}</span></div>
-      <div class="r-row"><span>日期</span><span>${t}</span></div>
-      <div class="r-row"><span>联系电话</span><span>${o.customer_phone || "-"}</span></div>
+
+      <div class="r-row"><span class="r-label">联系电话 Phone</span><span>${o.customer_phone || "-"}</span></div>
+
       <div class="r-line"></div>
+
+      <div class="r-section-title">文件明细 FILES</div>
       ${fileLines}
+
       <div class="r-line"></div>
-      <div class="r-row"><span>纸张/颜色</span><span>${o.paper_size} · ${o.color_mode === "bw" ? "黑白" : "彩色"}</span></div>
-      <div class="r-row"><span>份数</span><span>${o.copies}份</span></div>
-      <div class="r-row"><span>双面/过胶</span><span>${o.double_sided ? "双面" : "单面"} / ${o.plastic_cover ? "过胶" : "不过胶"}</span></div>
-      <div class="r-line"></div>
-      <div class="r-row"><span>印刷费</span><span>RM ${base.toFixed(2)}</span></div>
-      ${cover > 0 ? `<div class="r-row"><span>过胶费</span><span>RM ${cover.toFixed(2)}</span></div>` : ""}
-      <div class="r-row r-total"><span>总额</span><span>RM ${Number(o.price).toFixed(2)}</span></div>
-      <div class="r-row"><span>付款状态</span><span>${payText}</span></div>
-      <div class="r-line"></div>
-      <div class="r-foot">谢谢惠顾 Thank you!</div>
+
+      <div class="r-section-title">打印规格 SPEC</div>
+      <div class="r-row"><span class="r-label">纸张 / 颜色</span><span>${o.paper_size} · ${o.color_mode === "bw" ? "黑白" : "彩色"}</span></div>
+      <div class="r-row"><span class="r-label">份数</span><span>${o.copies} 份</span></div>
+      <div class="r-row"><span class="r-label">单/双面</span><span>${o.double_sided ? "双面" : "单面"}</span></div>
+      <div class="r-row"><span class="r-label">过胶</span><span>${o.plastic_cover ? "是" : "否"}</span></div>
+
+      <div class="r-total-block">
+        <div class="r-row"><span class="r-label">印刷费</span><span>RM ${base.toFixed(2)}</span></div>
+        ${cover > 0 ? `<div class="r-row"><span class="r-label">过胶费</span><span>RM ${cover.toFixed(2)}</span></div>` : ""}
+        <div class="r-row r-total"><span>总额 TOTAL</span><span class="r-total-val">RM ${Number(o.price).toFixed(2)}</span></div>
+      </div>
+      <div class="r-pay-status">${payText}</div>
+
+      <div class="r-foot">
+        <div class="r-stamp-word">谢谢惠顾</div>
+        <div>THANK YOU FOR YOUR ORDER</div>
+      </div>
     `;
   }
 
