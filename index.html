@@ -300,6 +300,13 @@
   }
   .btn.stamp{ background:var(--stamp); border-color:var(--stamp); }
   .btn.stamp:active{ background:var(--stamp-dark); }
+  .btn.outline{
+    background:transparent;
+    color:var(--carbon);
+    border-color:var(--carbon);
+    margin-top:10px;
+  }
+  .btn.outline:active{ background:rgba(216,162,48,0.12); }
 
   .error-msg{
     font-size:12.5px; color:var(--error);
@@ -484,6 +491,9 @@
     <div class="actions">
       <button class="btn stamp" id="paidBtn">
         <span id="paidBtnText">✓ 我已经付款，提交订单</span>
+      </button>
+      <button class="btn outline" id="payAtStoreBtn">
+        <span id="payAtStoreBtnText">🏪 到店再付款，先提交订单</span>
       </button>
       <button class="btn secondary" id="backBtn">← 返回修改</button>
       <p class="error-msg" id="payError"></p>
@@ -795,11 +805,18 @@
   });
 
   // ---- submit order ----
-  document.getElementById("paidBtn").addEventListener("click", async () => {
-    const btn = document.getElementById("paidBtn");
-    const btnText = document.getElementById("paidBtnText");
-    btn.disabled = true;
-    btnText.innerHTML = '<span class="spinner"></span> 提交中...';
+  async function submitOrder(paymentMethod) {
+    const paidBtn = document.getElementById("paidBtn");
+    const storeBtn = document.getElementById("payAtStoreBtn");
+    const paidBtnText = document.getElementById("paidBtnText");
+    const storeBtnText = document.getElementById("payAtStoreBtnText");
+    paidBtn.disabled = true;
+    storeBtn.disabled = true;
+    if (paymentMethod === "online_claimed") {
+      paidBtnText.innerHTML = '<span class="spinner"></span> 提交中...';
+    } else {
+      storeBtnText.innerHTML = '<span class="spinner"></span> 提交中...';
+    }
     showError("payError", "");
 
     try {
@@ -830,13 +847,14 @@
           plastic_cover: state.cover === "yes",
           price: total,
           status: "new",
+          payment_method: paymentMethod,
           notes: state.isQuick ? "⚡极速下单：客人未逐项确认规格，请致电确认后再打印" : null
         })
         .select()
         .single();
       if (insErr) throw insErr;
 
-      notifyWhatsApp(orderData, total);
+      notifyWhatsApp(orderData, total, paymentMethod);
 
       document.getElementById("orderIdShow").textContent =
         "订单号 #" + orderData.id.slice(0, 8).toUpperCase();
@@ -847,20 +865,29 @@
     } catch (err) {
       console.error(err);
       showError("payError", "提交失败，请检查网络后重试 (" + (err.message || err) + ")");
-      btn.disabled = false;
-      btnText.textContent = "✓ 我已经付款，提交订单";
+      paidBtn.disabled = false;
+      storeBtn.disabled = false;
+      paidBtnText.textContent = "✓ 我已经付款，提交订单";
+      storeBtnText.textContent = "🏪 到店再付款，先提交订单";
     }
-  });
+  }
 
-  function notifyWhatsApp(order, total) {
+  document.getElementById("paidBtn").addEventListener("click", () => submitOrder("online_claimed"));
+  document.getElementById("payAtStoreBtn").addEventListener("click", () => submitOrder("pay_at_store"));
+
+  function notifyWhatsApp(order, total, paymentMethod) {
     if (!CALLMEBOT_APIKEY || CALLMEBOT_APIKEY.startsWith("PASTE_")) return;
     const fileLines = order.files.map(f => `· ${f.name} (${f.pages}页)`).join("\n");
+    const payLine = paymentMethod === "online_claimed"
+      ? "💳 客人已扫码付款（请核实到账）"
+      : "🏪 客人选择到店付款（未付）";
     const msg =
       `🖨️ 新打印订单 #${order.id.slice(0,8).toUpperCase()}\n` +
       `${order.paper_size} ${order.color_mode === "bw" ? "黑白" : "彩色"} · 共${order.total_pages}页 × ${order.copies}份\n` +
       (order.plastic_cover ? "过胶 ✓\n" : "") +
       (order.double_sided ? "双面\n" : "单面\n") +
       `金额 RM ${total.toFixed(2)}\n` +
+      `${payLine}\n` +
       `电话: ${order.customer_phone || "未留"}\n` +
       `文件(${order.files.length}个):\n${fileLines}`;
     const url = `https://api.callmebot.com/whatsapp.php?phone=${CALLMEBOT_PHONE}&apikey=${CALLMEBOT_APIKEY}&text=${encodeURIComponent(msg)}`;
