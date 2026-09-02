@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>CFT 打印订单 Print Order</title>
+<title>Kedai 19 - Print Order</title>
 <meta name="theme-color" content="#221F1A">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
@@ -420,9 +420,9 @@
 <div class="ticket">
 
   <div class="head">
-    <p class="tag">CFT GLOBAL ENTERPRISE · PRINT SERVICE</p>
-    <h1>打印下单 PRINT ORDER</h1>
-    <p>上传文件 → 选规格 → 扫码付款，剩下交给我们</p>
+    <p class="tag">KEDAI 19 · PRINT SERVICE</p>
+    <h1>PRINT ORDER</h1>
+    <p>Upload your files, pick your options, scan to pay — we handle the rest.</p>
   </div>
 
   <div class="perf"></div>
@@ -431,41 +431,41 @@
   <div id="formView">
 
     <div class="section">
-      <h2><span class="no">01</span>上传文件 UPLOAD</h2>
+      <h2><span class="no">01</span>UPLOAD FILES</h2>
       <div class="drop" id="dropZone">
         <span class="icon">📎</span>
-        <div class="main">点击选择文件（可一次选多个）</div>
-        <div class="sub">支持 PDF / JPG / PNG / DOC / DOCX，单个最大 50MB</div>
+        <div class="main">Tap to choose files (you can pick more than one)</div>
+        <div class="sub">PDF / JPG / PNG / DOC / DOCX supported, max 50MB each</div>
       </div>
       <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
       <div class="file-list" id="fileList"></div>
       <div class="files-total hidden" id="filesTotal"></div>
 
-      <button type="button" class="howto-toggle" id="howtoToggle">💬 文件在WhatsApp里？点这里看怎么快速传过来</button>
+      <button type="button" class="howto-toggle" id="howtoToggle">💬 Files in WhatsApp? Tap here for a quick way to send them</button>
       <div class="howto-box hidden" id="howtoBox">
-        <b>一次传很多个文件（不用一个个点）：</b>
+        <b>Send many files at once (no need to tap one by one):</b>
         <ol>
-          <li>在WhatsApp聊天里，长按第一个文件</li>
-          <li>继续点其他文件（可以一次勾几十个）</li>
-          <li>点分享图标 → 选「储存到文件」(iPhone) 或「另存为」(Android)</li>
-          <li>回来这里点上传 → 选「全选」→ 一次全部选中</li>
+          <li>Long-press the first file in your WhatsApp chat</li>
+          <li>Keep tapping other files (select dozens at once if you like)</li>
+          <li>Tap Share → choose "Save to Files" (iPhone) or "Save as" (Android)</li>
+          <li>Come back here, tap Upload → choose "Select All" to grab them all at once</li>
         </ol>
       </div>
 
-      <button type="button" class="btn stamp quick-btn hidden" id="quickBtn">⚡ 极速下单（用默认设置，事后我们再跟你确认）</button>
+      <button type="button" class="btn stamp quick-btn hidden" id="quickBtn">⚡ Quick Order (default settings, we'll confirm with you after)</button>
 
-      <p class="hint-save">📌 文件在 WhatsApp / Email 里的话，先长按「保存到手机相册」或「保存到文件」，再回来这里上传。可以一次上传多张图片或多份PDF。</p>
+      <p class="hint-save">📌 If your files are in WhatsApp or Email, save them to your phone first, then come back here to upload. You can upload several photos or PDFs at once.</p>
     </div>
 
     <div class="perf"></div>
 
     <div class="section">
-      <h2><span class="no">02</span>打印规格 SPEC</h2>
+      <h2><span class="no">02</span>PRINT SPEC</h2>
 
       <div class="wiz-progress" id="wizProgress"></div>
 
       <div class="wiz-step" data-step="size">
-        <p class="wiz-q">选择纸张尺寸</p>
+        <p class="wiz-q">Choose paper size</p>
         <div class="size-cards" data-group="size">
           <button type="button" class="size-card" data-value="A5">
             <span class="size-rect" style="width:25px;height:35px;"></span>
@@ -486,16 +486,16 @@
       </div>
 
       <div class="wiz-step hidden" data-step="color">
-        <p class="wiz-q">黑白还是彩色？</p>
+        <p class="wiz-q">Black &amp; white or color?</p>
         <div class="chips-big" data-group="color">
-          <button type="button" class="chip-big active" data-value="bw">黑白</button>
-          <button type="button" class="chip-big" data-value="color">彩色</button>
+          <button type="button" class="chip-big active" data-value="bw">B&amp;W</button>
+          <button type="button" class="chip-big" data-value="color">Color</button>
         </div>
-        <button type="button" class="wiz-back" data-back>← 上一步</button>
+        <button type="button" class="wiz-back" data-back>← Back</button>
       </div>
 
       <div class="wiz-step hidden" data-step="copies">
-        <p class="wiz-q">要印几份？</p>
+        <p class="wiz-q">How many copies?</p>
         <div style="display:flex; justify-content:center; margin-bottom:14px;">
           <div class="stepper big" data-group="copies">
             <button type="button" data-dir="-1">−</button>
@@ -503,34 +503,34 @@
             <button type="button" data-dir="1">+</button>
           </div>
         </div>
-        <button type="button" class="btn stamp wiz-next" data-next>下一步 →</button>
-        <button type="button" class="wiz-back" data-back>← 上一步</button>
+        <button type="button" class="btn stamp wiz-next" data-next>Next →</button>
+        <button type="button" class="wiz-back" data-back>← Back</button>
       </div>
 
       <div class="wiz-step hidden" data-step="double">
-        <p class="wiz-q">要双面打印吗？</p>
+        <p class="wiz-q">Double-sided printing?</p>
         <div class="chips-big" data-group="double">
-          <button type="button" class="chip-big" data-value="no">单面</button>
-          <button type="button" class="chip-big active" data-value="yes">双面</button>
+          <button type="button" class="chip-big" data-value="no">Single-sided</button>
+          <button type="button" class="chip-big active" data-value="yes">Double-sided</button>
         </div>
-        <button type="button" class="wiz-back" data-back>← 上一步</button>
+        <button type="button" class="wiz-back" data-back>← Back</button>
       </div>
 
       <div class="wiz-step hidden" data-step="cover">
-        <p class="wiz-q">需要过胶吗？</p>
+        <p class="wiz-q">Need lamination?</p>
         <div class="chips-big" data-group="cover">
-          <button type="button" class="chip-big active" data-value="no">不用</button>
-          <button type="button" class="chip-big" data-value="yes">要过胶</button>
+          <button type="button" class="chip-big active" data-value="no">No</button>
+          <button type="button" class="chip-big" data-value="yes">Yes, laminate</button>
         </div>
-        <button type="button" class="wiz-back" data-back>← 上一步</button>
+        <button type="button" class="wiz-back" data-back>← Back</button>
       </div>
 
       <div class="wiz-step hidden" data-step="phone">
-        <p class="wiz-q">联系电话（方便通知你取件）</p>
+        <p class="wiz-q">Phone number (so we can reach you when it's ready)</p>
         <input type="tel" id="phoneInput" placeholder="012-3456789">
-        <button type="button" class="btn stamp wiz-next" data-next>完成 →</button>
-        <button type="button" class="wiz-skip" data-skip>跳过，不留电话</button>
-        <button type="button" class="wiz-back" data-back>← 上一步</button>
+        <button type="button" class="btn stamp wiz-next" data-next>Done →</button>
+        <button type="button" class="wiz-skip" data-skip>Skip, no phone number</button>
+        <button type="button" class="wiz-back" data-back>← Back</button>
       </div>
     </div>
 
@@ -538,13 +538,13 @@
       <div class="perf"></div>
 
       <div class="total-block">
-        <div class="total-row"><span id="priceBreak1">A4 黑白 × 1页 × 1份</span><span id="priceBreak1v">RM 0.50</span></div>
-        <div class="total-row hidden" id="priceBreak2Row"><span>过胶</span><span id="priceBreak2v">RM 0.00</span></div>
-        <div class="total-row main"><span>总额 TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
+        <div class="total-row"><span id="priceBreak1">A4 B&amp;W × 1 pg × 1 copy</span><span id="priceBreak1v">RM 0.50</span></div>
+        <div class="total-row hidden" id="priceBreak2Row"><span>Lamination</span><span id="priceBreak2v">RM 0.00</span></div>
+        <div class="total-row main"><span>TOTAL</span><span class="val" id="totalPrice">RM 0.50</span></div>
       </div>
 
       <div class="actions">
-        <button class="btn stamp" id="toPaymentBtn">下一步：付款 →</button>
+        <button class="btn stamp" id="toPaymentBtn">Next: Payment →</button>
         <p class="error-msg" id="formError"></p>
       </div>
     </div>
@@ -553,22 +553,22 @@
   <!-- ============ STEP 2: PAYMENT ============ -->
   <div id="payView" class="hidden">
     <div class="section">
-      <h2><span class="no">03</span>扫码付款 PAY</h2>
+      <h2><span class="no">03</span>SCAN TO PAY</h2>
       <div class="qr-wrap">
         <img src="assets/duitnow-qr.jpg" alt="DuitNow QR">
       </div>
       <div class="qr-amount" id="payAmount">RM 0.50</div>
-      <div class="qr-note">DuitNow QR · 任何银行 App / e-wallet 都可扫</div>
+      <div class="qr-note">DuitNow QR · Scan with any banking app or e-wallet</div>
     </div>
     <div class="perf"></div>
     <div class="actions">
       <button class="btn stamp" id="paidBtn">
-        <span id="paidBtnText">✓ 我已经付款，提交订单</span>
+        <span id="paidBtnText">✓ I've paid, submit order</span>
       </button>
       <button class="btn outline" id="payAtStoreBtn">
-        <span id="payAtStoreBtnText">🏪 到店再付款，先提交订单</span>
+        <span id="payAtStoreBtnText">🏪 Pay at the store, submit now</span>
       </button>
-      <button class="btn secondary" id="backBtn">← 返回修改</button>
+      <button class="btn secondary" id="backBtn">← Back to edit</button>
       <p class="error-msg" id="payError"></p>
     </div>
   </div>
@@ -576,10 +576,10 @@
   <!-- ============ STEP 3: DONE ============ -->
   <div id="doneView" class="hidden">
     <div class="done-block">
-      <div class="stampmark">已提交 SUBMITTED</div>
-      <h3>订单已收到</h3>
-      <p>我们会核实付款后开始打印</p>
-      <p>好了会用你的号码联系你取件</p>
+      <div class="stampmark">SUBMITTED</div>
+      <h3>Order received</h3>
+      <p>We'll verify payment and start printing</p>
+      <p>We'll contact you at your number once it's ready</p>
       <div class="oid" id="orderIdShow"></div>
     </div>
   </div>
@@ -696,28 +696,28 @@
       fileList.innerHTML = "";
       filesTotal.classList.add("hidden");
       dropZone.classList.remove("compact");
-      dropZone.querySelector(".main").textContent = "点击选择文件（可一次选多个）";
+      dropZone.querySelector(".main").textContent = "Tap to choose files (you can pick more than one)";
       return;
     }
     dropZone.classList.add("compact");
-    dropZone.querySelector(".main").textContent = "+ 继续添加文件";
+    dropZone.querySelector(".main").textContent = "+ Add more files";
 
     fileList.innerHTML = state.files.map(f => {
       let statusHtml, statusCls = "";
       if (f.status === "detecting") {
-        statusHtml = '<span class="spin-sm"></span> 识别页数中...';
+        statusHtml = '<span class="spin-sm"></span> Detecting pages...';
       } else if (f.status === "ok") {
-        statusHtml = "✓ 自动识别"; statusCls = "ok";
+        statusHtml = "✓ Auto-detected"; statusCls = "ok";
       } else if (f.status === "image") {
-        statusHtml = "🖼️ 图片 · 按1页算";
+        statusHtml = "🖼️ Image · counted as 1 page";
       } else {
-        statusHtml = "⚠️ 请手动确认页数";
+        statusHtml = "⚠️ Please confirm page count manually";
       }
       return `
         <div class="file-row" data-id="${f.id}">
           <div class="file-row-top">
             <span class="file-row-name">${f.file.name}</span>
-            <button type="button" class="file-row-remove" data-id="${f.id}">移除 ✕</button>
+            <button type="button" class="file-row-remove" data-id="${f.id}">Remove ✕</button>
           </div>
           <div class="file-row-bottom">
             <span class="file-row-status ${statusCls}">${statusHtml}</span>
@@ -732,7 +732,7 @@
     }).join("");
 
     filesTotal.classList.remove("hidden");
-    filesTotal.textContent = `共 ${state.files.length} 个文件 · 合计 ${totalPages()} 页`;
+    filesTotal.textContent = `${state.files.length} file(s) · ${totalPages()} page(s) total`;
 
     fileList.querySelectorAll(".file-row-remove").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -785,7 +785,7 @@
   function addFiles(fileArr) {
     for (const f of fileArr) {
       if (f.size > 50 * 1024 * 1024) {
-        showError("formError", `"${f.name}" 太大了，单个文件最大 50MB`);
+        showError("formError", `"${f.name}" is too large — max 50MB per file`);
         continue;
       }
       const entry = { id: "f" + (fileSeq++), file: f, pages: 1, status: "detecting" };
@@ -812,8 +812,8 @@
 
   // ---- quick order ----
   document.getElementById("quickBtn").addEventListener("click", () => {
-    if (state.files.length === 0) { showError("formError", "请先上传要打印的文件"); return; }
-    if (state.files.some(f => f.status === "detecting")) { showError("formError", "文件还在识别中，请稍等一下"); return; }
+    if (state.files.length === 0) { showError("formError", "Please upload your files first"); return; }
+    if (state.files.some(f => f.status === "detecting")) { showError("formError", "Files are still being processed, please wait a moment"); return; }
     // 重置成默认设置
     state.size = "A4"; state.color = "bw"; state.copies = 1;
     state.double = "yes"; state.cover = "no";
@@ -883,9 +883,9 @@
   function renderPrice() {
     const { base, cover, total, pages } = calcPrice();
     const sizeLabel = state.size;
-    const colorLabel = state.color === "bw" ? "黑白" : "彩色";
+    const colorLabel = state.color === "bw" ? "B&W" : "Color";
     document.getElementById("priceBreak1").textContent =
-      `${sizeLabel} ${colorLabel} × ${pages}页 × ${state.copies}份`;
+      `${sizeLabel} ${colorLabel} × ${pages} pg × ${state.copies} copy`;
     document.getElementById("priceBreak1v").textContent = `RM ${base.toFixed(2)}`;
     const row2 = document.getElementById("priceBreak2Row");
     if (cover > 0) {
@@ -906,8 +906,8 @@
 
   // ---- step 1 -> step 2 ----
   document.getElementById("toPaymentBtn").addEventListener("click", () => {
-    if (state.files.length === 0) { showError("formError", "请先上传要打印的文件"); return; }
-    if (state.files.some(f => f.status === "detecting")) { showError("formError", "文件还在识别中，请稍等一下"); return; }
+    if (state.files.length === 0) { showError("formError", "Please upload your files first"); return; }
+    if (state.files.some(f => f.status === "detecting")) { showError("formError", "Files are still being processed, please wait a moment"); return; }
     state.isQuick = false;
     showError("formError", "");
     const { total } = calcPrice();
@@ -931,9 +931,9 @@
     paidBtn.disabled = true;
     storeBtn.disabled = true;
     if (paymentMethod === "online_claimed") {
-      paidBtnText.innerHTML = '<span class="spinner"></span> 提交中...';
+      paidBtnText.innerHTML = '<span class="spinner"></span> Submitting...';
     } else {
-      storeBtnText.innerHTML = '<span class="spinner"></span> 提交中...';
+      storeBtnText.innerHTML = '<span class="spinner"></span> Submitting...';
     }
     showError("payError", "");
 
@@ -975,18 +975,18 @@
       notifyWhatsApp(orderData, total, paymentMethod);
 
       document.getElementById("orderIdShow").textContent =
-        "订单号 #" + orderData.id.slice(0, 8).toUpperCase();
+        "Order #" + orderData.id.slice(0, 8).toUpperCase();
       document.getElementById("payView").classList.add("hidden");
       document.getElementById("doneView").classList.remove("hidden");
       window.scrollTo(0,0);
 
     } catch (err) {
       console.error(err);
-      showError("payError", "提交失败，请检查网络后重试 (" + (err.message || err) + ")");
+      showError("payError", "Submission failed, please check your connection and try again (" + (err.message || err) + ")");
       paidBtn.disabled = false;
       storeBtn.disabled = false;
-      paidBtnText.textContent = "✓ 我已经付款，提交订单";
-      storeBtnText.textContent = "🏪 到店再付款，先提交订单";
+      paidBtnText.textContent = "✓ I've paid, submit order";
+      storeBtnText.textContent = "🏪 Pay at the store, submit now";
     }
   }
 
