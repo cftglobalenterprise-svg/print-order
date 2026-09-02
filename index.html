@@ -810,10 +810,10 @@
   }
 
   // 手机拍的照片通常很大（几MB），网络慢的时候上传很容易卡住
-  // 上传前先在手机上压缩一下，体积能小很多，上传快很多
+  // 只压真正很大的照片，而且保留足够打印清晰度用的分辨率（2400px 已经够A3高质量打印）
   function compressImageIfNeeded(file) {
     return new Promise((resolve) => {
-      if (!file.type.startsWith("image/") || file.size < 1.2 * 1024 * 1024) {
+      if (!file.type.startsWith("image/") || file.size < 3 * 1024 * 1024) {
         resolve(file);
         return;
       }
@@ -821,7 +821,7 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 1600;
+          const maxDim = 2400;
           let { width, height } = img;
           if (width > maxDim || height > maxDim) {
             if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
@@ -832,9 +832,9 @@
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, height);
           canvas.toBlob((blob) => {
-            if (!blob) { resolve(file); return; }
+            if (!blob || blob.size >= file.size) { resolve(file); return; }
             resolve(new File([blob], file.name, { type: "image/jpeg" }));
-          }, "image/jpeg", 0.75);
+          }, "image/jpeg", 0.92);
         };
         img.onerror = () => resolve(file);
         img.src = e.target.result;
