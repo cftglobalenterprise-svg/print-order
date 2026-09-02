@@ -530,9 +530,15 @@
         console.error("清理文件失败", err);
       }
 
-      const { error } = await sb.from("print_orders").delete().eq("id", id);
+      const { data: delData, error } = await sb.from("print_orders").delete().eq("id", id).select();
       if (error) {
         alert("删除失败: " + error.message);
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = "🗑 删除订单";
+        return;
+      }
+      if (!delData || delData.length === 0) {
+        alert("删除没有生效——数据库权限(RLS)可能还没开放delete，请在Supabase跑一下delete policy的SQL。");
         deleteBtn.disabled = false;
         deleteBtn.textContent = "🗑 删除订单";
         return;
